@@ -69,7 +69,7 @@ namespace MGVisualizer
 
 		void clear()
 		{
-			color_buffer.clear({ 1, 0, 0 });
+			color_buffer.clear({ 0, 0, 0 });
 
 			for (int* z = z_buffer.data(), *end = z + z_buffer.size(); z != end; z++)
 			{

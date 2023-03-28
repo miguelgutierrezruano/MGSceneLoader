@@ -5,17 +5,11 @@
 
 #include <SFML/Window.hpp>
 
-#include <Color_Buffer.hpp>
-#include <cstdlib>
-#include <vector>
 #include "Rasterizer.h"
+#include "View.h"
 
 using namespace sf;
 using namespace MGVisualizer;
-
-using  std::vector;
-using argb::Rgb888;
-using argb::Color_Buffer;
 
 int main()
 {
@@ -24,17 +18,9 @@ int main()
 	constexpr auto window_height = 600u;
 
 	Window window(VideoMode(window_width, window_height), "MGSceneLoader", Style::Titlebar | Style::Close);
+    View   view(window_width, window_height);
 
 	window.setVerticalSyncEnabled(true);
-
-	// Get from view class from Mesh Loader
-	{
-		typedef Rgb888                Color;
-		typedef Color_Buffer< Color > Color_Buffer;
-
-		Color_Buffer               color_buffer(window_width, window_height);
-		Rasterizer<Color_Buffer>   rasterizer(color_buffer);
-	}
 
     // Run the main loop:
 
@@ -48,6 +34,10 @@ int main()
         {
             if (event.type == Event::Closed) exit = true;
         }
+
+        view.update();
+
+        view.render();
 
         window.display();
 
