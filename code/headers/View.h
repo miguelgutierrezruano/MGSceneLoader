@@ -23,10 +23,6 @@ namespace MGVisualizer
 
         typedef Rgb888                Color;
         typedef Color_Buffer< Color > Color_Buffer;
-        typedef fvec4                 Vertex;
-        typedef vector< Vertex >      Vertex_Buffer;
-        typedef vector< int    >      Index_Buffer;
-        typedef vector< Color  >      Vertex_Colors;
 
     private:
 
@@ -35,11 +31,12 @@ namespace MGVisualizer
         Color_Buffer               color_buffer;
         Rasterizer< Color_Buffer > rasterizer;
 
-        Vertex_Buffer     original_vertices;
-        Index_Buffer      original_indices;
-        Vertex_Colors     original_colors;
-        Vertex_Buffer     transformed_vertices;
-        vector< ivec4 >   display_vertices;
+		// Converted to glm to avoid confusion
+		vector< vec4 >  original_vertices;
+		vector< int >   original_indices;
+		vector< Color > original_colors;
+		vector< vec4 >  transformed_vertices;
+        vector< ivec4 > display_vertices;
 
         unsigned width;
         unsigned height;
@@ -53,7 +50,7 @@ namespace MGVisualizer
 
     private:
 
-        bool  is_frontface(const Vertex* const projected_vertices, const int* const indices);
+        bool  is_frontface(const vec4* const projected_vertices, const int* const indices);
         float rand_clamp() { return float(rand() & 0xff) * 0.0039215f; }
 
     };

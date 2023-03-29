@@ -21,6 +21,9 @@
     <ClCompile Include="..\code\sources\View.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\sources\Entity.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\headers\Rasterizer.h">
@@ -29,7 +32,10 @@
     <ClInclude Include="..\code\headers\View.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\code\headers\math.hpp">
+    <ClInclude Include="..\code\headers\Entity.h">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\headers\Transform.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

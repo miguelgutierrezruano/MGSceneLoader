@@ -49,7 +49,7 @@ namespace MGVisualizer
             {
                 auto& vertex = mesh->mVertices[index];
 
-                original_vertices[index] = Vertex(vertex.x, -vertex.y, vertex.z, 1.f);
+                original_vertices[index] = vec4(vertex.x, -vertex.y, vertex.z, 1.f);
             }
 
             transformed_vertices.resize(number_of_vertices);
@@ -70,7 +70,7 @@ namespace MGVisualizer
 
             original_indices.resize(number_of_triangles * 3);
 
-            Index_Buffer::iterator indices_iterator = original_indices.begin();
+            vector<int>::iterator indices_iterator = original_indices.begin();
 
             for (size_t index = 0; index < number_of_triangles; index++)
             {
@@ -114,7 +114,7 @@ namespace MGVisualizer
             // Se multiplican todos los vértices originales con la matriz de transformación y
             // se guarda el resultado en otro vertex buffer:
 
-            Vertex& vertex = transformed_vertices[index] = transformation * original_vertices[index];
+            vec4& vertex = transformed_vertices[index] = transformation * original_vertices[index];
 
             // La matriz de proyección en perspectiva hace que el último componente del vector
             // transformado no tenga valor 1.0, por lo que hay que normalizarlo dividiendo:
@@ -169,11 +169,11 @@ namespace MGVisualizer
         color_buffer.blit_to_window();
     }
 
-    bool View::is_frontface(const Vertex* const projected_vertices, const int* const indices)
+    bool View::is_frontface(const vec4* const projected_vertices, const int* const indices)
     {
-        const Vertex& v0 = projected_vertices[indices[0]];
-        const Vertex& v1 = projected_vertices[indices[1]];
-        const Vertex& v2 = projected_vertices[indices[2]];
+        const vec4& v0 = projected_vertices[indices[0]];
+        const vec4& v1 = projected_vertices[indices[1]];
+        const vec4& v2 = projected_vertices[indices[2]];
 
         // Se asumen coordenadas proyectadas y polígonos definidos en sentido horario.
         // Se comprueba a qué lado de la línea que pasa por v0 y v1 queda el punto v2:

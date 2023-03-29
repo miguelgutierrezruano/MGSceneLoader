@@ -84,12 +84,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="..\code\sources\Entity.cpp" />
     <ClCompile Include="..\code\sources\main.cpp" />
     <ClCompile Include="..\code\sources\View.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\code\headers\math.hpp" />
+    <ClInclude Include="..\code\headers\Entity.h" />
     <ClInclude Include="..\code\headers\Rasterizer.h" />
+    <ClInclude Include="..\code\headers\Transform.h" />
     <ClInclude Include="..\code\headers\View.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
