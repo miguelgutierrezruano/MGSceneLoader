@@ -16,75 +16,18 @@ using namespace glm;
 
 namespace MGVisualizer
 {
+    // Initialize view attributes
     View::View(unsigned width, unsigned height)
         :
         width(width),
         height(height),
         color_buffer(width, height),
         rasterizer(color_buffer)
-    {
-        Assimp::Importer importer;
+    { 
+        Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
+        entities.emplace("rabbit", rabbit);
 
-        auto scene = importer.ReadFile
-        (
-            mesh_file_path,
-            aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
-        );
-
-        // If scene is null file could not be loaded
-
-        if (scene && scene->mNumMeshes > 0)
-        {
-            // Make loop to get all meshes
-
-            auto mesh = scene->mMeshes[0];
-
-            size_t number_of_vertices = mesh->mNumVertices;
-
-            // Copy vertex coordinates
-
-            original_vertices.resize(number_of_vertices);
-
-            for (size_t index = 0; index < number_of_vertices; index++)
-            {
-                auto& vertex = mesh->mVertices[index];
-
-                original_vertices[index] = vec4(vertex.x, -vertex.y, vertex.z, 1.f);
-            }
-
-            transformed_vertices.resize(number_of_vertices);
-            display_vertices.resize(number_of_vertices);
-
-            // Random color to each vertex. TODO: Get color from mesh
-
-            original_colors.resize(number_of_vertices);
-
-            for (size_t index = 0; index < number_of_vertices; index++)
-            {
-                original_colors[index].set(rand_clamp(), rand_clamp(), rand_clamp());
-            }
-
-            // Generate indexes of triangles
-
-            size_t number_of_triangles = mesh->mNumFaces;
-
-            original_indices.resize(number_of_triangles * 3);
-
-            vector<int>::iterator indices_iterator = original_indices.begin();
-
-            for (size_t index = 0; index < number_of_triangles; index++)
-            {
-                auto& face = mesh->mFaces[index];
-
-                assert(face.mNumIndices == 3);              // Una face puede llegar a tener de 1 a 4 índices,
-                                                            // pero nos interesa que solo haya triángulos
-                auto indices = face.mIndices;
-
-                *indices_iterator++ = int(indices[0]);
-                *indices_iterator++ = int(indices[1]);
-                *indices_iterator++ = int(indices[2]);
-            }
-        }
+        display_vertices.resize(entities["rabbit"]->get_original_vertices()->size());
     }
 
     void View::update()
@@ -108,13 +51,14 @@ namespace MGVisualizer
         mat4 transformation = projection * translation * rotation_y * scaling;
 
         // Se transforman todos los vértices usando la matriz de transformación resultante:
+        size_t number_of_vertices = entities["rabbit"]->get_original_vertices()->size();
 
-        for (size_t index = 0, number_of_vertices = original_vertices.size(); index < number_of_vertices; index++)
+        for (size_t index = 0; index < number_of_vertices; index++)
         {
             // Se multiplican todos los vértices originales con la matriz de transformación y
             // se guarda el resultado en otro vertex buffer:
 
-            vec4& vertex = transformed_vertices[index] = transformation * original_vertices[index];
+            vec4& vertex = entities["rabbit"]->get_transformed_vertices()->at(index) = transformation * entities["rabbit"]->get_original_vertices()->at(index);
 
             // La matriz de proyección en perspectiva hace que el último componente del vector
             // transformado no tenga valor 1.0, por lo que hay que normalizarlo dividiendo:
@@ -140,25 +84,28 @@ namespace MGVisualizer
         mat4 translation = translate(identity, glm::vec3(float(width / 2), float(height / 2), 0.f));
         mat4 transformation = translation * scaling;
 
-        for (size_t index = 0, number_of_vertices = transformed_vertices.size(); index < number_of_vertices; index++)
+        size_t number_of_vertices = entities["rabbit"]->get_transformed_vertices()->size();
+
+        for (size_t index = 0; index < number_of_vertices; index++)
         {
             // Has to be highp ivec4 
-            display_vertices[index] = highp_ivec4(transformation * transformed_vertices[index]);
+            display_vertices[index] = highp_ivec4(transformation * entities["rabbit"]->get_transformed_vertices()->at(index));
         }
 
         // Se borra el framebúffer y se dibujan los triángulos:
 
         rasterizer.clear();
 
-        for (int* indices = original_indices.data(), *end = indices + original_indices.size(); indices < end; indices += 3)
+        // Make const iterator to do this
+        for (int* indices = entities["rabbit"]->get_original_indices()->data(), *end = indices + entities["rabbit"]->get_original_indices()->size(); indices < end; indices += 3)
         {
-            if (is_frontface(transformed_vertices.data(), indices))
+            if (is_frontface(entities["rabbit"]->get_transformed_vertices()->data(), indices))
             {
                 // Se establece el color del polígono a partir del color de su primer vértice:
 
-                rasterizer.set_color(original_colors[*indices]);
+                rasterizer.set_color(entities["rabbit"]->get_original_colors()->at(*indices));
 
-                // Se rellena el polígono:
+                // TODO: Clip vertices
 
                 rasterizer.fill_convex_polygon_z_buffer(display_vertices.data(), indices, indices + 3);
             }

@@ -5,12 +5,21 @@
 
 #pragma once
 
+#include <vector>
+#include <Color_Buffer.hpp>
 #include "Transform.h"
 
 namespace MGVisualizer
 {
+
+	using argb::Rgb888;
+	using  std::vector;
+
 	class Entity
 	{
+
+		// Define Color as Rgb888
+		typedef Rgb888 Color;
 
 	private:
 
@@ -19,6 +28,10 @@ namespace MGVisualizer
 		Transform transform;
 
 		// Original vertices and colors
+		vector< vec4  > original_vertices;
+		vector< int   > original_indices;
+		vector< Color > original_colors;
+		vector< vec4  > transformed_vertices;
 
 	public:
 
@@ -26,9 +39,18 @@ namespace MGVisualizer
 
 		Transform* get_transform() { return &transform; }
 
+		vector< vec4  >* get_transformed_vertices() { return &transformed_vertices; }
+
+		const vector< vec4  >* get_original_vertices() { return &original_vertices; }
+		const vector< Color >* get_original_colors  () { return   &original_colors; }
+		vector< int   >* get_original_indices () { return  &original_indices; }
+
 	private:
 
 		void load_model(const char* model_path);
+
+		// TODO: Erase this
+		float rand_clamp() { return float(rand() & 0xff) * 0.0039215f; }
 
 	};
 }

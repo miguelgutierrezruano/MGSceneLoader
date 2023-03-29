@@ -38,11 +38,6 @@ namespace MGVisualizer
         Color_Buffer               color_buffer;
         Rasterizer< Color_Buffer > rasterizer;
 
-		// Converted to glm to avoid confusion, move original vectors to entity
-		vector< vec4 >  original_vertices;
-		vector< int >   original_indices;
-		vector< Color > original_colors;
-		vector< vec4 >  transformed_vertices;
         vector< ivec4 > display_vertices;
 
         unsigned width;
