@@ -6,7 +6,8 @@
 #include <cassert>
 #include <cmath>
 #include "View.h"
-#include "math.hpp"
+
+#include <glm/gtc/constants.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -26,6 +27,10 @@ namespace MGVisualizer
     { 
         Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
         entities.emplace("rabbit", rabbit);
+
+        entities["rabbit"]->get_transform()->set_position(vec3(0.f, -0.5f, 10.f));
+        entities["rabbit"]->get_transform()->set_rotation(vec3(glm::pi<float>(), glm::pi<float>(), 0.f));
+        entities["rabbit"]->get_transform()->set_scale(vec3(3.f, 3.f, 3.f));
     }
 
     void View::update()
@@ -38,15 +43,11 @@ namespace MGVisualizer
 
         // Se crean las matrices de transformación:
 
-        mat4 identity(1);
-        mat4 scaling = scale(identity, vec3(4, 4, 4));
-        mat4 rotation_y = identity;
-        mat4 translation = translate(identity, vec3(0.f, 0.5f, -10.f));
-        mat4 projection = perspective(20.f, 1.f, 15.f, float(width) / height);
+        mat4 projection = perspective(20.f, float(width) / height, 1.f, 20.f);
 
         // Creación de la matriz de transformación unificada:
 
-        mat4 transformation = projection * translation * rotation_y * scaling;
+        mat4 transformation = projection * entities["rabbit"]->get_transform()->get_matrix();
 
         // Se transforman todos los vértices usando la matriz de transformación resultante:
         size_t number_of_vertices = entities["rabbit"]->get_original_vertices()->size();
