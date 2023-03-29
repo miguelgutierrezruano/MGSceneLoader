@@ -26,8 +26,6 @@ namespace MGVisualizer
     { 
         Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
         entities.emplace("rabbit", rabbit);
-
-        display_vertices.resize(entities["rabbit"]->get_original_vertices()->size());
     }
 
     void View::update()
@@ -88,16 +86,17 @@ namespace MGVisualizer
 
         for (size_t index = 0; index < number_of_vertices; index++)
         {
-            // Has to be highp ivec4 
-            display_vertices[index] = highp_ivec4(transformation * entities["rabbit"]->get_transformed_vertices()->at(index));
+            entities["rabbit"]->get_display_vertices()->at(index) = ivec4(transformation * entities["rabbit"]->get_transformed_vertices()->at(index));
         }
 
         // Se borra el framebúffer y se dibujan los triángulos:
 
         rasterizer.clear();
 
+        int* indices = entities["rabbit"]->get_original_indices()->data();
+
         // Make const iterator to do this
-        for (int* indices = entities["rabbit"]->get_original_indices()->data(), *end = indices + entities["rabbit"]->get_original_indices()->size(); indices < end; indices += 3)
+        for (int *end = indices + entities["rabbit"]->get_original_indices()->size(); indices < end; indices += 3)
         {
             if (is_frontface(entities["rabbit"]->get_transformed_vertices()->data(), indices))
             {
@@ -107,7 +106,7 @@ namespace MGVisualizer
 
                 // TODO: Clip vertices
 
-                rasterizer.fill_convex_polygon_z_buffer(display_vertices.data(), indices, indices + 3);
+                rasterizer.fill_convex_polygon_z_buffer(entities["rabbit"]->get_display_vertices()->data(), indices, indices + 3);
             }
         }
 

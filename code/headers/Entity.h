@@ -27,11 +27,12 @@ namespace MGVisualizer
 
 		Transform transform;
 
-		// Original vertices and colors
+		// Mesh vectors
 		vector< vec4  > original_vertices;
 		vector< int   > original_indices;
 		vector< Color > original_colors;
 		vector< vec4  > transformed_vertices;
+		vector< ivec4 > display_vertices;
 
 	public:
 
@@ -40,10 +41,13 @@ namespace MGVisualizer
 		Transform* get_transform() { return &transform; }
 
 		vector< vec4  >* get_transformed_vertices() { return &transformed_vertices; }
+		vector< ivec4 >* get_display_vertices    () { return     &display_vertices; }
+
+		// Make const, find a way to iterate
+		vector< int >* get_original_indices() { return  &original_indices; }
 
 		const vector< vec4  >* get_original_vertices() { return &original_vertices; }
 		const vector< Color >* get_original_colors  () { return   &original_colors; }
-		vector< int   >* get_original_indices () { return  &original_indices; }
 
 	private:
 

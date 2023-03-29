@@ -51,8 +51,9 @@ namespace MGVisualizer
                 original_vertices[index] = vec4(vertex.x, -vertex.y, vertex.z, 1.f);
             }
 
-            transformed_vertices.resize(number_of_vertices);
             original_colors.resize(number_of_vertices);
+            transformed_vertices.resize(number_of_vertices);
+            display_vertices.resize(number_of_vertices);
 
             // Random color to each vertex. TODO: Get color from mesh
 

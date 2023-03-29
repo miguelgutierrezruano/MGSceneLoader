@@ -6,7 +6,6 @@
 #pragma once
 
 #include <cstdlib>
-#include <vector>
 #include <map>
 #include <string>
 
@@ -17,7 +16,6 @@
 
 namespace MGVisualizer
 {
-    using  std::vector;
 	using  std::map;
     using argb::Rgb888;
     using argb::Color_Buffer;
@@ -31,14 +29,10 @@ namespace MGVisualizer
 
     private:
 
-        static constexpr char mesh_file_path[] = "../binaries/stanford-bunny.obj";
-
 		map< std::string, Entity* > entities;
 
         Color_Buffer               color_buffer;
         Rasterizer< Color_Buffer > rasterizer;
-
-        vector< ivec4 > display_vertices;
 
         unsigned width;
         unsigned height;
