@@ -7,13 +7,18 @@
 
 #include <cstdlib>
 #include <vector>
+#include <map>
+#include <string>
+
 #include <Color_Buffer.hpp>
 #include <glm/glm.hpp>
 #include "Rasterizer.h"
+#include "Entity.h"
 
 namespace MGVisualizer
 {
     using  std::vector;
+	using  std::map;
     using argb::Rgb888;
     using argb::Color_Buffer;
 
@@ -28,10 +33,12 @@ namespace MGVisualizer
 
         static constexpr char mesh_file_path[] = "../binaries/stanford-bunny.obj";
 
+		map< std::string, Entity* > entities;
+
         Color_Buffer               color_buffer;
         Rasterizer< Color_Buffer > rasterizer;
 
-		// Converted to glm to avoid confusion
+		// Converted to glm to avoid confusion, move original vectors to entity
 		vector< vec4 >  original_vertices;
 		vector< int >   original_indices;
 		vector< Color > original_colors;

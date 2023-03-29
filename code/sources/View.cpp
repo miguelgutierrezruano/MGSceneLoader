@@ -31,17 +31,17 @@ namespace MGVisualizer
             aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
         );
 
-        // Si scene es un puntero nulo significa que el archivo no se pudo cargar con éxito:
+        // If scene is null file could not be loaded
 
         if (scene && scene->mNumMeshes > 0)
         {
-            // Para este ejemplo se coge la primera malla solamente:
+            // Make loop to get all meshes
 
             auto mesh = scene->mMeshes[0];
 
             size_t number_of_vertices = mesh->mNumVertices;
 
-            // Se copian los datos de coordenadas de vértices:
+            // Copy vertex coordinates
 
             original_vertices.resize(number_of_vertices);
 
@@ -55,7 +55,7 @@ namespace MGVisualizer
             transformed_vertices.resize(number_of_vertices);
             display_vertices.resize(number_of_vertices);
 
-            // Se inicializan los datos de color de los vértices con colores aleatorios:
+            // Random color to each vertex. TODO: Get color from mesh
 
             original_colors.resize(number_of_vertices);
 
@@ -64,7 +64,7 @@ namespace MGVisualizer
                 original_colors[index].set(rand_clamp(), rand_clamp(), rand_clamp());
             }
 
-            // Se generan los índices de los triángulos:
+            // Generate indexes of triangles
 
             size_t number_of_triangles = mesh->mNumFaces;
 

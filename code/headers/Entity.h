@@ -26,5 +26,9 @@ namespace MGVisualizer
 
 		Transform* get_transform() { return &transform; }
 
+	private:
+
+		void load_model(const char* model_path);
+
 	};
 }

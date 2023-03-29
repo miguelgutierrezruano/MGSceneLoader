@@ -47,5 +47,7 @@ namespace MGVisualizer
 		void set_position(vec3 newPosition) { position = newPosition; }
 		void set_rotation(vec3 newRotation) { rotation = newRotation; }
 		void set_scale(vec3 newScale) { scale = newScale; }
+
+		// Make matrix out of scale, rotate and translate
 	};
 }
