@@ -59,15 +59,16 @@ namespace MGVisualizer
 
 	private:
 
+		// Since in this project most meshes will be static is better to keep the matrix
 		void update_matrix()
 		{
 			mat4 identity = mat4(1);
 			mat4 scalingMatrix = glm::scale(identity, scale);
 
 			// Rotate based on euler angles
-			mat4 xRotate = glm::rotate(identity, glm::radians(rotation.x), vec3(1.f, 0.f, 0.f));
-			mat4 yRotate = glm::rotate(identity, glm::radians(rotation.y), vec3(0.f, 1.f, 0.f));
-			mat4 zRotate = glm::rotate(identity, glm::radians(rotation.z), vec3(0.f, 0.f, 1.f));
+			mat4 xRotate = glm::rotate(identity, radians(rotation.x), vec3(1.f, 0.f, 0.f));
+			mat4 yRotate = glm::rotate(identity, radians(rotation.y), vec3(0.f, 1.f, 0.f));
+			mat4 zRotate = glm::rotate(identity, radians(rotation.z), vec3(0.f, 0.f, 1.f));
 
 			mat4 rotationMatrix = zRotate * yRotate * xRotate;
 

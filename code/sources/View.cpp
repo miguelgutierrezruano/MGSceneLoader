@@ -38,7 +38,7 @@ namespace MGVisualizer
         entities.emplace("deer", deer);
 
         entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 40.f));
-        entities["deer"]->get_transform()->set_rotation(vec3(180, 315, 0.f));
+        entities["deer"]->get_transform()->set_rotation(vec3(180, 90, 0.f));
         entities["deer"]->get_transform()->set_scale(vec3(0.015f, 0.015f, 0.015f));
     }
 
@@ -46,7 +46,13 @@ namespace MGVisualizer
     {
         // Create projection matrix
 
-        mat4 projection = perspective(20.f, float(width) / height, 0.5f, 100.f);
+		static float angle = 0.f;
+
+		angle++;
+
+		entities["rabbit"]->get_transform()->set_rotation(vec3(180, angle, 0.f));
+
+        mat4 projection = perspective(40.f, float(width) / height, 0.5f, 100.f);
 
         // Update each entity
         for (auto& [name, entity] : entities)
