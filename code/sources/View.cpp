@@ -1,13 +1,11 @@
 
-// Este código es de dominio público.
-// angel.rodriguez@esne.edu
-// 2013.12 - 2021.04
+// Distributed under MIT License
+// @miguelgutierrezruano
+// 2023
 
 #include <cassert>
 #include <cmath>
 #include "View.h"
-
-#include <glm/gtc/constants.hpp>
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -28,46 +26,71 @@ namespace MGVisualizer
         Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
         entities.emplace("rabbit", rabbit);
 
-        entities["rabbit"]->get_transform()->set_position(vec3(0.f, -0.5f, 10.f));
-        entities["rabbit"]->get_transform()->set_rotation(vec3(glm::pi<float>(), glm::pi<float>(), 0.f));
-        entities["rabbit"]->get_transform()->set_scale(vec3(3.f, 3.f, 3.f));
+        entities["rabbit"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
+        entities["rabbit"]->get_transform()->set_rotation(vec3(180, 180, 0.f));
+        entities["rabbit"]->get_transform()->set_scale(vec3(2.f, 2.f, 2.f));
+
+        Entity* rabbit2 = new Entity("../binaries/stanford-bunny.obj", rabbit);
+        entities.emplace("rabbit2", rabbit2);
+        entities["rabbit2"]->get_transform()->set_position(vec3(-2.f, 0.f, 0.f));
+
+        Entity* deer = new Entity("../binaries/deer.obj");
+        entities.emplace("deer", deer);
+
+        entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 40.f));
+        entities["deer"]->get_transform()->set_rotation(vec3(180, 315, 0.f));
+        entities["deer"]->get_transform()->set_scale(vec3(0.015f, 0.015f, 0.015f));
     }
 
     void View::update()
     {
-        // Se actualizan los parámetros de transformatión (sólo se modifica el ángulo):
+        // Create projection matrix
 
-        static float angle = 0.f;
+        mat4 projection = perspective(20.f, float(width) / height, 0.5f, 100.f);
 
-        angle += 0.025f;
-
-        // Se crean las matrices de transformación:
-
-        mat4 projection = perspective(20.f, float(width) / height, 1.f, 20.f);
-
-        // Creación de la matriz de transformación unificada:
-
-        mat4 transformation = projection * entities["rabbit"]->get_transform()->get_matrix();
-
-        // Se transforman todos los vértices usando la matriz de transformación resultante:
-        size_t number_of_vertices = entities["rabbit"]->get_original_vertices()->size();
-
-        for (size_t index = 0; index < number_of_vertices; index++)
+        // Update each entity
+        for (auto& [name, entity] : entities)
         {
-            // Se multiplican todos los vértices originales con la matriz de transformación y
-            // se guarda el resultado en otro vertex buffer:
+            // Apply parent and projection transformations
 
-            vec4& vertex = entities["rabbit"]->get_transformed_vertices()->at(index) = transformation * entities["rabbit"]->get_original_vertices()->at(index);
+            mat4 parentMatrix = mat4(1);
 
-            // La matriz de proyección en perspectiva hace que el último componente del vector
-            // transformado no tenga valor 1.0, por lo que hay que normalizarlo dividiendo:
+            // Get parent matrix
+            if (entity->get_parent() != nullptr)
+            {
+                Entity* parent = entity->get_parent();
+                parentMatrix *= parent->get_transform()->get_matrix();
 
-            float divisor = 1.f / vertex.w;
+                while (parent != nullptr)
+                {
+                    parent = parent->get_parent();
 
-            vertex.x *= divisor;
-            vertex.y *= divisor;
-            vertex.z *= divisor;
-            vertex.w = 1.f;
+                    if(parent != nullptr)
+                        parentMatrix *= parent->get_transform()->get_matrix();
+                }
+            }
+
+            mat4 transformation = projection * parentMatrix * entity->get_transform()->get_matrix();
+
+            size_t number_of_vertices = entity->get_original_vertices()->size();
+
+            // Transform every vertex by transformation matrix
+            for (size_t index = 0; index < number_of_vertices; index++)
+            {
+                // Save transformed vertex in transformed vertices vector
+                vec4& vertex = entity->get_transformed_vertices()->at(index) =
+                    transformation * entity->get_original_vertices()->at(index);
+
+                // La matriz de proyección en perspectiva hace que el último componente del vector
+                // transformado no tenga valor 1.0, por lo que hay que normalizarlo dividiendo:
+
+                float divisor = 1.f / vertex.w;
+
+                vertex.x *= divisor;
+                vertex.y *= divisor;
+                vertex.z *= divisor;
+                vertex.w = 1.f;
+            }
         }
     }
 
@@ -79,35 +102,40 @@ namespace MGVisualizer
         // rango de int (que es lo que espera fill_convex_polygon_z_buffer).
 
         mat4 identity(1);
-        mat4 scaling = scale(identity, glm::vec3(float(width / 2), float(height / 2), 100000000.f));
+        mat4 scaling = scale(identity, glm::vec3(float(width / 2), float(height / 2), 1.f));
         mat4 translation = translate(identity, glm::vec3(float(width / 2), float(height / 2), 0.f));
         mat4 transformation = translation * scaling;
 
-        size_t number_of_vertices = entities["rabbit"]->get_transformed_vertices()->size();
-
-        for (size_t index = 0; index < number_of_vertices; index++)
-        {
-            entities["rabbit"]->get_display_vertices()->at(index) = ivec4(transformation * entities["rabbit"]->get_transformed_vertices()->at(index));
-        }
-
-        // Se borra el framebúffer y se dibujan los triángulos:
-
         rasterizer.clear();
 
-        int* indices = entities["rabbit"]->get_original_indices()->data();
-
-        // Make const iterator to do this
-        for (int *end = indices + entities["rabbit"]->get_original_indices()->size(); indices < end; indices += 3)
+        // Render each entity
+        for (auto& [name, entity] : entities)
         {
-            if (is_frontface(entities["rabbit"]->get_transformed_vertices()->data(), indices))
+            size_t number_of_vertices = entity->get_transformed_vertices()->size();
+
+            for (size_t index = 0; index < number_of_vertices; index++)
             {
-                // Se establece el color del polígono a partir del color de su primer vértice:
+                entity->get_display_vertices()->at(index) =
+                    ivec4(transformation * entity->get_transformed_vertices()->at(index));
+            }
 
-                rasterizer.set_color(entities["rabbit"]->get_original_colors()->at(*indices));
+            // Create size pointers
+            int* indices = entity->get_original_indices()->data();
+            int* end = indices + entity->get_original_indices()->size();
 
-                // TODO: Clip vertices
+            // Make const iterator to do this
+            for (; indices < end; indices += 3)
+            {
+                if (is_frontface(entity->get_transformed_vertices()->data(), indices))
+                {
+                    // Se establece el color del polígono a partir del color de su primer vértice:
 
-                rasterizer.fill_convex_polygon_z_buffer(entities["rabbit"]->get_display_vertices()->data(), indices, indices + 3);
+                    rasterizer.set_color(entity->get_original_colors()->at(*indices));
+
+                    // TODO: Clip vertices
+
+                    rasterizer.fill_convex_polygon_z_buffer(entity->get_display_vertices()->data(), indices, indices + 3);
+                }
             }
         }
 

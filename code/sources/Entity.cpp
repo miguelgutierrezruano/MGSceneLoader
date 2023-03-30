@@ -11,7 +11,7 @@
 
 namespace MGVisualizer
 {
-	Entity::Entity(const char* model_path, vec3 position, vec3 rotation, vec3 scale, Entity* parent_entity)
+	Entity::Entity(const char* model_path, Entity* parent_entity, vec3 position, vec3 rotation, vec3 scale)
 	{
 		transform = Transform(position, rotation, scale);
 		parent = parent_entity;
@@ -60,6 +60,7 @@ namespace MGVisualizer
             for (size_t index = 0; index < number_of_vertices; index++)
             {
                 original_colors[index].set(rand_clamp(), rand_clamp(), rand_clamp());
+                //original_colors[index].set(&mesh->mColors[0].r, mesh->mColors[0].g, mesh->mColors[0].b);
             }
 
             // Generate indexes of triangles

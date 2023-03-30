@@ -1,7 +1,7 @@
 
-// Este código es de dominio público.
-// angel.rodriguez@esne.edu
-// 2013.12 - 2021.04
+// Distributed under MIT License
+// @miguelgutierrezruano
+// 2023
 
 #pragma once
 
@@ -47,7 +47,6 @@ namespace MGVisualizer
     private:
 
         bool  is_frontface(const vec4* const projected_vertices, const int* const indices);
-        float rand_clamp() { return float(rand() & 0xff) * 0.0039215f; }
 
     };
 }

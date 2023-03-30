@@ -36,7 +36,7 @@ namespace MGVisualizer
 
 	public:
 
-		Entity(const char* model_path, vec3 position = vec3(), vec3 rotation = vec3(), vec3 scale = vec3(1.f, 1.f, 1.f), Entity* parent_entity = nullptr);
+		Entity(const char* model_path, Entity* parent_entity = nullptr, vec3 position = vec3(), vec3 rotation = vec3(), vec3 scale = vec3(1.f, 1.f, 1.f));
 
 		Transform* get_transform() { return &transform; }
 
@@ -48,6 +48,8 @@ namespace MGVisualizer
 
 		const vector< vec4  >* get_original_vertices() { return &original_vertices; }
 		const vector< Color >* get_original_colors  () { return   &original_colors; }
+
+		Entity* get_parent() { return parent; }
 
 	private:
 
