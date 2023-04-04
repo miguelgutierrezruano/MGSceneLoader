@@ -44,9 +44,11 @@ namespace MGVisualizer
         void update();
         void render();
 
-    private:
-
+        void set_rasterizer_color(Color color);
+        void rasterizer_fill_polygon(const ivec4* const vertices,
+            const int* const indices_begin,
+            const int* const indices_end);
+        
         bool  is_frontface(const vec4* const projected_vertices, const int* const indices);
-
     };
 }

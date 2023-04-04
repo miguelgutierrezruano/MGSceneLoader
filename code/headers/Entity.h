@@ -11,6 +11,7 @@
 
 namespace MGVisualizer
 {
+	class View;
 
 	using argb::Rgb888;
 	using  std::vector;
@@ -39,20 +40,10 @@ namespace MGVisualizer
 		Entity(const char* model_path, Entity* parent_entity = nullptr, vec3 position = vec3(), vec3 rotation = vec3(), vec3 scale = vec3(1.f, 1.f, 1.f));
 
 		Transform* get_transform() { return &transform; }
-
-		vector< vec4  >* get_transformed_vertices() { return &transformed_vertices; }
-		vector< ivec4 >* get_display_vertices    () { return     &display_vertices; }
-
-		// Probably not necessary
-		vector< int >* get_original_indices() { return  &original_indices; }
-
-		const vector< vec4  >* get_original_vertices() { return &original_vertices; }
-		const vector< Color >* get_original_colors  () { return   &original_colors; }
-
 		Entity* get_parent() { return parent; }
 
 		void update(mat4 projection);
-		void render();
+		void render(mat4 transformation, View * view);
 
 	private:
 

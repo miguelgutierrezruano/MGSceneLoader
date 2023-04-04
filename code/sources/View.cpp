@@ -74,42 +74,23 @@ namespace MGVisualizer
 
         rasterizer.clear();
 
-        // TODO: Do this on entity giving transformation matrix as parameter
-
         // Render each entity
         for (auto& [name, entity] : entities)
-        {
-            size_t number_of_vertices = entity->get_transformed_vertices()->size();
-
-            for (size_t index = 0; index < number_of_vertices; index++)
-            {
-                entity->get_display_vertices()->at(index) =
-                    ivec4(transformation * entity->get_transformed_vertices()->at(index));
-            }
-
-            // Create size pointers
-            int* indices = entity->get_original_indices()->data();
-            int* end = indices + entity->get_original_indices()->size();
-
-            // Make const iterator to do this
-            for (; indices < end; indices += 3)
-            {
-                if (is_frontface(entity->get_transformed_vertices()->data(), indices))
-                {
-                    // Se establece el color del polígono a partir del color de su primer vértice:
-
-                    rasterizer.set_color(entity->get_original_colors()->at(*indices));
-
-                    // TODO: Clip vertices
-
-                    rasterizer.fill_convex_polygon_z_buffer(entity->get_display_vertices()->data(), indices, indices + 3);
-                }
-            }
-        }
+            entity->render(transformation, this);
 
         // Se copia el framebúffer oculto en el framebúffer de la ventana:
 
         color_buffer.blit_to_window();
+    }
+
+    void View::set_rasterizer_color(Color color)
+    {
+        rasterizer.set_color(color);
+    }
+
+    void View::rasterizer_fill_polygon(const ivec4* const vertices, const int* const indices_begin, const int* const indices_end)
+    {
+        rasterizer.fill_convex_polygon_z_buffer(vertices, indices_begin, indices_end);
     }
 
     bool View::is_frontface(const vec4* const projected_vertices, const int* const indices)
