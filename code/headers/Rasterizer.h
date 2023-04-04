@@ -48,6 +48,7 @@ namespace MGVisualizer
 			color_buffer(target),
 			z_buffer(target.get_width()* target.get_height())
 		{
+
 		}
 
 		const Color_Buffer& get_color_buffer() const

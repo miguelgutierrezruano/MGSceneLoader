@@ -85,4 +85,53 @@ namespace MGVisualizer
             }
         }
 	}
+
+    void Entity::update(mat4 projection)
+    {
+        // Apply parent and projection transformations
+        mat4 parentMatrix = mat4(1);
+
+        // Get parent matrix
+        if (parent != nullptr)
+        {
+            Entity* parentIt = parent;
+            parentMatrix *= parentIt->get_transform()->get_matrix();
+
+            while (parentIt != nullptr)
+            {
+                parentIt = parentIt->get_parent();
+
+                if (parentIt != nullptr)
+                    parentMatrix *= parentIt->get_transform()->get_matrix();
+            }
+        }
+
+        mat4 transformation = projection * parentMatrix * transform.get_matrix();
+
+        size_t number_of_vertices = original_vertices.size();
+
+        // Transform every vertex by transformation matrix
+        for (size_t index = 0; index < number_of_vertices; index++)
+        {
+            // Save transformed vertex in transformed vertices vector
+            vec4& vertex = transformed_vertices.at(index) =
+                transformation * original_vertices.at(index);
+
+            // Give w value 1 back, normalize it by dividing
+
+            float divisor = 1.f / vertex.w;
+
+            vertex.x *= divisor;
+            vertex.y *= divisor;
+            vertex.z *= divisor;
+            vertex.w = 1.f;
+        }
+    }
+
+    void Entity::render()
+    {
+
+    }
+
+
 }

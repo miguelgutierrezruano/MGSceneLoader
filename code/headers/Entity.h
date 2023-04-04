@@ -43,13 +43,16 @@ namespace MGVisualizer
 		vector< vec4  >* get_transformed_vertices() { return &transformed_vertices; }
 		vector< ivec4 >* get_display_vertices    () { return     &display_vertices; }
 
-		// Make const, find a way to iterate
+		// Probably not necessary
 		vector< int >* get_original_indices() { return  &original_indices; }
 
 		const vector< vec4  >* get_original_vertices() { return &original_vertices; }
 		const vector< Color >* get_original_colors  () { return   &original_colors; }
 
 		Entity* get_parent() { return parent; }
+
+		void update(mat4 projection);
+		void render();
 
 	private:
 

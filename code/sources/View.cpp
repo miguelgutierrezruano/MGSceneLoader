@@ -39,7 +39,7 @@ namespace MGVisualizer
 
         entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 40.f));
         entities["deer"]->get_transform()->set_rotation(vec3(180, 90, 0.f));
-        entities["deer"]->get_transform()->set_scale(vec3(0.015f, 0.015f, 0.015f));
+        entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));
     }
 
     void View::update()
@@ -52,52 +52,12 @@ namespace MGVisualizer
 
 		entities["rabbit"]->get_transform()->set_rotation(vec3(180, angle, 0.f));
 
+        // TODO: Apply camera inverse transform to projection matrix
         mat4 projection = perspective(40.f, float(width) / height, 0.5f, 100.f);
 
         // Update each entity
         for (auto& [name, entity] : entities)
-        {
-            // Apply parent and projection transformations
-
-            mat4 parentMatrix = mat4(1);
-
-            // Get parent matrix
-            if (entity->get_parent() != nullptr)
-            {
-                Entity* parent = entity->get_parent();
-                parentMatrix *= parent->get_transform()->get_matrix();
-
-                while (parent != nullptr)
-                {
-                    parent = parent->get_parent();
-
-                    if(parent != nullptr)
-                        parentMatrix *= parent->get_transform()->get_matrix();
-                }
-            }
-
-            mat4 transformation = projection * parentMatrix * entity->get_transform()->get_matrix();
-
-            size_t number_of_vertices = entity->get_original_vertices()->size();
-
-            // Transform every vertex by transformation matrix
-            for (size_t index = 0; index < number_of_vertices; index++)
-            {
-                // Save transformed vertex in transformed vertices vector
-                vec4& vertex = entity->get_transformed_vertices()->at(index) =
-                    transformation * entity->get_original_vertices()->at(index);
-
-                // La matriz de proyección en perspectiva hace que el último componente del vector
-                // transformado no tenga valor 1.0, por lo que hay que normalizarlo dividiendo:
-
-                float divisor = 1.f / vertex.w;
-
-                vertex.x *= divisor;
-                vertex.y *= divisor;
-                vertex.z *= divisor;
-                vertex.w = 1.f;
-            }
-        }
+            entity->update(projection);
     }
 
     void View::render()
@@ -113,6 +73,8 @@ namespace MGVisualizer
         mat4 transformation = translation * scaling;
 
         rasterizer.clear();
+
+        // TODO: Do this on entity giving transformation matrix as parameter
 
         // Render each entity
         for (auto& [name, entity] : entities)
