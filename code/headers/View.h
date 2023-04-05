@@ -13,6 +13,7 @@
 #include <glm/glm.hpp>
 #include "Rasterizer.h"
 #include "Entity.h"
+#include "Camera.h"
 
 namespace MGVisualizer
 {
@@ -29,6 +30,7 @@ namespace MGVisualizer
 
     private:
 
+        Camera camera;
 		map< std::string, Entity* > entities;
 
         Color_Buffer               color_buffer;
