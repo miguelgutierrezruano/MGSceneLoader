@@ -9,6 +9,7 @@
 #include <map>
 #include <string>
 
+#include <SFML/Window.hpp>
 #include <Color_Buffer.hpp>
 #include <glm/glm.hpp>
 #include "Rasterizer.h"
@@ -17,6 +18,8 @@
 
 namespace MGVisualizer
 {
+    using namespace sf;
+
 	using  std::map;
     using argb::Rgb888;
     using argb::Color_Buffer;
@@ -43,9 +46,12 @@ namespace MGVisualizer
 
         View(unsigned width, unsigned height);
 
+        // Used in main loop
         void update();
         void render();
+        void process_events(Event & sfEvent, float delta);
 
+        // Used in entity render
         void set_rasterizer_color(Color color);
         void rasterizer_fill_polygon(const ivec4* const vertices,
             const int* const indices_begin,

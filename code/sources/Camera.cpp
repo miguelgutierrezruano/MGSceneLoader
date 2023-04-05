@@ -12,6 +12,9 @@ namespace MGVisualizer
 		fov = 40.f;
 		nearPlane = 1.f;
 		farPlane = 100.f;
+
+		movementSpeed = 5.f;
+		rotationSpeed = 20.f;
 	}
 
 	mat4 Camera::get_projection_matrix(float aspect_ratio)

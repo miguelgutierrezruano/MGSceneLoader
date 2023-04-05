@@ -131,7 +131,7 @@ namespace MGVisualizer
 
             for (size_t index = 0; index < number_of_vertices; index++)
             {
-                original_colors[index].set(rand_clamp(), rand_clamp(), rand_clamp());
+                original_colors[index].set(1.f, 1.f, 1.f);
                 //original_colors[index].set(&mesh->mColors[0].r, mesh->mColors[0].g, mesh->mColors[0].b);
             }
 

@@ -3,6 +3,7 @@
 // @miguelgutierrezruano
 // 2023
 
+#include <iostream>
 #include <cassert>
 #include <cmath>
 #include "View.h"
@@ -84,6 +85,32 @@ namespace MGVisualizer
         // Se copia el framebúffer oculto en el framebúffer de la ventana:
 
         color_buffer.blit_to_window();
+    }
+
+    void View::process_events(Event& sfEvent, float delta)
+    {
+        if (!Mouse::isButtonPressed(Mouse::Button::Left))
+        {
+            if (Keyboard::isKeyPressed(Keyboard::W))
+                camera.move_camera_front(delta);
+            if (Keyboard::isKeyPressed(Keyboard::A))
+                camera.move_camera_right(delta);
+            if (Keyboard::isKeyPressed(Keyboard::S))
+                camera.move_camera_back(delta);
+            if (Keyboard::isKeyPressed(Keyboard::D))
+                camera.move_camera_left(delta);
+        }
+        else
+        {
+            if (Keyboard::isKeyPressed(Keyboard::W))
+                camera.rotate_camera_down(delta);
+            if (Keyboard::isKeyPressed(Keyboard::A))
+                camera.rotate_camera_right(delta);
+            if (Keyboard::isKeyPressed(Keyboard::S))
+                camera.rotate_camera_up(delta);
+            if (Keyboard::isKeyPressed(Keyboard::D))
+                camera.rotate_camera_left(delta);
+        }        
     }
 
     void View::set_rasterizer_color(Color color)
