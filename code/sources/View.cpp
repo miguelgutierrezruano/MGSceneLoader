@@ -24,11 +24,10 @@ namespace MGVisualizer
         color_buffer(width, height),
         rasterizer(color_buffer)
     { 
-        Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
+        /*Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
         entities.emplace("rabbit", rabbit);
 
         entities["rabbit"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
-        entities["rabbit"]->get_transform()->set_rotation(vec3(180, 180, 0.f));
         entities["rabbit"]->get_transform()->set_scale(vec3(2.f, 2.f, 2.f));
 
         Entity* rabbit2 = new Entity("../binaries/stanford-bunny.obj", rabbit);
@@ -39,8 +38,20 @@ namespace MGVisualizer
         entities.emplace("deer", deer);
 
         entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 40.f));
-        entities["deer"]->get_transform()->set_rotation(vec3(180, 90, 0.f));
-        entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));
+        entities["deer"]->get_transform()->set_rotation(vec3(0, 90, 0.f));
+        entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));*/
+
+        /*Entity* mcCree = new Entity("../binaries/mccree.blend");
+        entities.emplace("mccree", mcCree);
+
+        entities["mccree"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
+        entities["mccree"]->get_transform()->set_scale(vec3(0.5f, 0.5f, 0.5f));*/
+
+        Entity* ufo = new Entity("../binaries/UFO.fbx");
+        entities.emplace("ufo", ufo);
+
+        entities["ufo"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
+        entities["ufo"]->get_transform()->set_scale(vec3(0.01f, 0.01f, 0.01f));
 
         camera.transform.set_position(vec3(0, 0, 0));
     }
@@ -53,7 +64,7 @@ namespace MGVisualizer
 
 		angle++;
 
-		entities["rabbit"]->get_transform()->set_rotation(vec3(180, angle, 0.f));
+		//entities["rabbit"]->get_transform()->set_rotation(vec3(0, angle, 0.f));
 
         // Get projection matrix by moving the camera to (0, 0, 0) and the projection matrix
         mat4 inverseCamera = inverse(camera.transform.get_matrix());

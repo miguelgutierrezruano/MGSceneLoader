@@ -106,55 +106,69 @@ namespace MGVisualizer
 
         if (scene && scene->mNumMeshes > 0)
         {
-            // Make loop to get all meshes
-
-            auto mesh = scene->mMeshes[0];
-
-            size_t number_of_vertices = mesh->mNumVertices;
-
-            // Copy vertex coordinates
-
-            original_vertices.resize(number_of_vertices);
-
-            for (size_t index = 0; index < number_of_vertices; index++)
+            // Get size of vectors
             {
-                auto& vertex = mesh->mVertices[index];
+                size_t total_vertices = 0;
+                size_t total_triangles = 0;
 
-                original_vertices[index] = vec4(vertex.x, -vertex.y, vertex.z, 1.f);
+                for (unsigned i = 0; i < scene->mNumMeshes; i++)
+                {
+                    auto mesh = scene->mMeshes[i];
+
+                    total_vertices  += mesh->mNumVertices;
+                    total_triangles += mesh->mNumFaces;
+                }
+
+                original_vertices.resize(total_vertices);
+                original_colors.resize(total_vertices);
+                transformed_vertices.resize(total_vertices);
+                display_vertices.resize(total_vertices);
+
+                original_indices.reserve(total_triangles * 3);
             }
 
-            original_colors.resize(number_of_vertices);
-            transformed_vertices.resize(number_of_vertices);
-            display_vertices.resize(number_of_vertices);
+            size_t vertexCount = 0;
+            size_t indicesCount = 0;
 
-            // Random color to each vertex. TODO: Get color from mesh
-
-            for (size_t index = 0; index < number_of_vertices; index++)
+            // Loop to get all meshes
+            for (unsigned i = 0; i < scene->mNumMeshes; i++)
             {
-                original_colors[index].set(1.f, 1.f, 1.f);
-                //original_colors[index].set(&mesh->mColors[0].r, mesh->mColors[0].g, mesh->mColors[0].b);
+                auto mesh = scene->mMeshes[i];
+
+                aiColor4D diffuse_color;
+
+                // Get material of mesh
+                auto material = scene->mMaterials[mesh->mMaterialIndex];
+                aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse_color);
+
+                // Copy vertex coordinates
+                for (size_t index = 0; index < mesh->mNumVertices; index++)
+                {
+                    auto& vertex = mesh->mVertices[index];
+                    original_vertices[index + vertexCount] = vec4(vertex.x, vertex.y, vertex.z, 1.f);
+
+                    // Copy color coordinates
+                    original_colors[index + vertexCount].set(diffuse_color.r, diffuse_color.g, diffuse_color.b);
+                }
+
+                vertexCount += mesh->mNumVertices;
+
+                // Generate indexes of triangles
+                for (size_t index = 0; index < mesh->mNumFaces; index++)
+                {
+                    auto& face = mesh->mFaces[index];
+
+                    assert(face.mNumIndices == 3);              // Una face puede llegar a tener de 1 a 4 índices,
+                                                                // pero nos interesa que solo haya triángulos
+                    auto indices = face.mIndices;
+
+                    original_indices.push_back(int(indices[0] + mesh->mNumVertices));
+                    original_indices.push_back(int(indices[1] + mesh->mNumVertices));
+                    original_indices.push_back(int(indices[2] + mesh->mNumVertices));
+                }
             }
 
-            // Generate indexes of triangles
-
-            size_t number_of_triangles = mesh->mNumFaces;
-
-            original_indices.resize(number_of_triangles * 3);
-
-            vector<int>::iterator indices_iterator = original_indices.begin();
-
-            for (size_t index = 0; index < number_of_triangles; index++)
-            {
-                auto& face = mesh->mFaces[index];
-
-                assert(face.mNumIndices == 3);              // Una face puede llegar a tener de 1 a 4 índices,
-                                                            // pero nos interesa que solo haya triángulos
-                auto indices = face.mIndices;
-
-                *indices_iterator++ = int(indices[0]);
-                *indices_iterator++ = int(indices[1]);
-                *indices_iterator++ = int(indices[2]);
-            }
+            indicesCount += 1;
         }
     }
 }
