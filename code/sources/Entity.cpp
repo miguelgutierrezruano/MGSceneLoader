@@ -96,9 +96,20 @@ namespace MGVisualizer
 
                     view->set_rasterizer_color(original_colors[i].at(*indices));
 
-                    // TODO: Clip vertices
+                    bool inside = true;
 
-                    view->rasterizer_fill_polygon(display_vertices[i].data(), indices, indices + 3);
+                    // TODO: Clip vertices
+                    for (auto index = indices; index < indices + 3; index++)
+                    {
+                        if (display_vertices[i].at(*index).x > view->width ||
+                            display_vertices[i].at(*index).x < 0 ||
+                            display_vertices[i].at(*index).y > view->height ||
+                            display_vertices[i].at(*index).y < 0)
+                            inside = false;
+                    }
+
+                    if(inside)
+                        view->rasterizer_fill_polygon(display_vertices[i].data(), indices, indices + 3);
                 }
             }
         }

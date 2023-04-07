@@ -39,10 +39,12 @@ namespace MGVisualizer
         Color_Buffer               color_buffer;
         Rasterizer< Color_Buffer > rasterizer;
 
+        glm::vec2 mouseLastPosition;
+
+    public:
+
         unsigned width;
         unsigned height;
-
-        glm::vec2 mouseLastPosition;
 
     public:
 
