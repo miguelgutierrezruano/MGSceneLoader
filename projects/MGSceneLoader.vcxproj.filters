@@ -27,6 +27,9 @@
     <ClCompile Include="..\code\sources\Camera.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\sources\Transform.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\headers\Rasterizer.h">

@@ -24,7 +24,7 @@ namespace MGVisualizer
         color_buffer(width, height),
         rasterizer(color_buffer)
     { 
-        /*Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
+        Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
         entities.emplace("rabbit", rabbit);
 
         entities["rabbit"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
@@ -39,19 +39,21 @@ namespace MGVisualizer
 
         entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 40.f));
         entities["deer"]->get_transform()->set_rotation(vec3(0, 90, 0.f));
-        entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));*/
+        entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));
 
         /*Entity* mcCree = new Entity("../binaries/mccree.blend");
         entities.emplace("mccree", mcCree);
 
-        entities["mccree"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
+        entities["mccree"]->get_transform()->set_position(vec3(0.f, 0.f, 20.f));
+        entities["mccree"]->get_transform()->set_rotation(vec3(270, 90, 0.f));
         entities["mccree"]->get_transform()->set_scale(vec3(0.5f, 0.5f, 0.5f));*/
 
-        Entity* ufo = new Entity("../binaries/UFO.fbx");
+        /*Entity* ufo = new Entity("../binaries/UFO.fbx");
         entities.emplace("ufo", ufo);
 
         entities["ufo"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
-        entities["ufo"]->get_transform()->set_scale(vec3(0.01f, 0.01f, 0.01f));
+        entities["ufo"]->get_transform()->set_rotation(vec3(270, 270, 0.f));
+        entities["ufo"]->get_transform()->set_scale(vec3(0.1f, 0.1f, 0.1f));*/
 
         camera.transform.set_position(vec3(0, 0, 0));
     }
@@ -100,7 +102,21 @@ namespace MGVisualizer
 
     void View::process_events(Event& sfEvent, float delta)
     {
-        if (!Mouse::isButtonPressed(Mouse::Button::Left))
+        vec2 currentMousePosition = vec2(Mouse::getPosition().x, Mouse::getPosition().y);
+
+        vec2 positionDifference = currentMousePosition - mouseLastPosition;
+
+        mouseLastPosition = currentMousePosition;
+
+        if (Mouse::isButtonPressed(Mouse::Button::Left))
+        {
+            camera.move_camera(delta, positionDifference);
+        }
+        else if (Mouse::isButtonPressed(Mouse::Button::Middle))
+        {
+            camera.move_camera(delta, positionDifference);
+        }
+        else if(Mouse::isButtonPressed(Mouse::Button::Right))
         {
             if (Keyboard::isKeyPressed(Keyboard::W))
                 camera.move_camera_front(delta);
@@ -110,18 +126,17 @@ namespace MGVisualizer
                 camera.move_camera_back(delta);
             if (Keyboard::isKeyPressed(Keyboard::D))
                 camera.move_camera_left(delta);
-        }
-        else
+
+            camera.rotate_camera(delta, positionDifference);
+        }   
+
+        if (sfEvent.type == Event::MouseWheelScrolled)
         {
-            if (Keyboard::isKeyPressed(Keyboard::W))
-                camera.rotate_camera_down(delta);
-            if (Keyboard::isKeyPressed(Keyboard::A))
-                camera.rotate_camera_right(delta);
-            if (Keyboard::isKeyPressed(Keyboard::S))
-                camera.rotate_camera_up(delta);
-            if (Keyboard::isKeyPressed(Keyboard::D))
-                camera.rotate_camera_left(delta);
-        }        
+            if (sfEvent.mouseWheelScroll.delta > 0)
+                camera.move_camera_front(delta);
+            else
+                camera.move_camera_back(delta);
+        }
     }
 
     void View::set_rasterizer_color(Color color)

@@ -28,12 +28,12 @@ namespace MGVisualizer
 
 		Transform transform;
 
-		// Mesh vectors
-		vector< vec4  > original_vertices;
-		vector< int   > original_indices;
-		vector< Color > original_colors;
-		vector< vec4  > transformed_vertices;
-		vector< ivec4 > display_vertices;
+		// Mesh vectors foreach mesh of the model
+		vector< vector <  vec4 > > original_vertices;
+		vector< vector <   int > > original_indices;
+		vector< vector < Color > > original_colors;
+		vector< vector <  vec4 > > transformed_vertices;
+		vector< vector < ivec4 > > display_vertices;
 
 	public:
 
@@ -48,9 +48,5 @@ namespace MGVisualizer
 	private:
 
 		void load_model(const char* model_path);
-
-		// TODO: Erase this
-		float rand_clamp() { return float(rand() & 0xff) * 0.0039215f; }
-
 	};
 }

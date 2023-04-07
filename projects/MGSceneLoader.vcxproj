@@ -89,6 +89,7 @@
     <ClCompile Include="..\code\sources\Camera.cpp" />
     <ClCompile Include="..\code\sources\Entity.cpp" />
     <ClCompile Include="..\code\sources\main.cpp" />
+    <ClCompile Include="..\code\sources\Transform.cpp" />
     <ClCompile Include="..\code\sources\View.cpp" />
   </ItemGroup>
   <ItemGroup>

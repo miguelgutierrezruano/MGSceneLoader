@@ -42,6 +42,8 @@ namespace MGVisualizer
         unsigned width;
         unsigned height;
 
+        glm::vec2 mouseLastPosition;
+
     public:
 
         View(unsigned width, unsigned height);

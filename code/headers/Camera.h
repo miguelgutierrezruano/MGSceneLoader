@@ -31,48 +31,29 @@ namespace MGVisualizer
 
 		Camera();
 
-		// Maybe has to change to proper controls
 		void move_camera_front(float delta)
 		{  
 			vec3 lastPosition = transform.get_position();
-			transform.set_position(vec3(lastPosition.x, lastPosition.y, lastPosition.z + movementSpeed * delta));
+			transform.set_position(lastPosition - transform.get_forward() * movementSpeed * delta);
 		}
 		void  move_camera_back(float delta)
 		{
 			vec3 lastPosition = transform.get_position();
-			transform.set_position(vec3(lastPosition.x, lastPosition.y, lastPosition.z - movementSpeed * delta));
+			transform.set_position(lastPosition + transform.get_forward() * movementSpeed * delta);
 		}
 		void  move_camera_left(float delta)
 		{
 			vec3 lastPosition = transform.get_position();
-			transform.set_position(vec3(lastPosition.x - movementSpeed * delta, lastPosition.y, lastPosition.z));
+			transform.set_position(lastPosition - transform.get_right() * movementSpeed * delta);
 		}
 		void move_camera_right(float delta)
 		{
 			vec3 lastPosition = transform.get_position();
-			transform.set_position(vec3(lastPosition.x + movementSpeed * delta, lastPosition.y, lastPosition.z));
+			transform.set_position(lastPosition + transform.get_right() * movementSpeed * delta);
 		}
 
-		void rotate_camera_up(float delta)
-		{
-			vec3 lastRotation = transform.get_rotation();
-			transform.set_rotation(vec3(lastRotation.x + rotationSpeed * delta, lastRotation.y, lastRotation.z));
-		}
-		void  rotate_camera_down(float delta) 
-		{
-			vec3 lastRotation = transform.get_rotation();
-			transform.set_rotation(vec3(lastRotation.x - rotationSpeed * delta, lastRotation.y, lastRotation.z));
-		}
-		void  rotate_camera_left(float delta)
-		{
-			vec3 lastRotation = transform.get_rotation();
-			transform.set_rotation(vec3(lastRotation.x, lastRotation.y - rotationSpeed * delta, lastRotation.z));
-		}
-		void rotate_camera_right(float delta)
-		{
-			vec3 lastRotation = transform.get_rotation();
-			transform.set_rotation(vec3(lastRotation.x, lastRotation.y + rotationSpeed * delta, lastRotation.z));
-		}
+		void move_camera  (float delta, vec2 positionDifference);
+		void rotate_camera(float delta, vec2 positionDifference);
 
 		mat4 get_projection_matrix(float aspect_ratio);
 	};
