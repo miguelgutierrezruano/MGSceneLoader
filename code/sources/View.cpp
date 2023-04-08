@@ -146,7 +146,8 @@ namespace MGVisualizer
 
     void View::rasterizer_fill_polygon(const ivec4* const vertices, const int* const indices_begin, const int* const indices_end)
     {
-        rasterizer.fill_convex_polygon_z_buffer(vertices, indices_begin, indices_end);
+        if(vertices != nullptr)
+            rasterizer.fill_convex_polygon_z_buffer(vertices, indices_begin, indices_end);
     }
 
     bool View::is_frontface(const vec4* const projected_vertices, const int* const indices)
