@@ -16,12 +16,25 @@ namespace MGVisualizer
 
 		typedef Rgb888 Color;
 
+	public:
+
+		enum Types
+		{
+			Ambient, 
+			Directional,
+			Point
+		};
+
 	protected:
+
+		Types type;
 
 		Color color;
 		float intensity;
 
 	public:
+
+		Types get_type     () { return type; }
 
 		Color get_color    () { return color; }
 		float get_intensity() { return intensity; }
@@ -33,6 +46,8 @@ namespace MGVisualizer
 
 		Light()
 		{
+			type = Light::Ambient;
+
 			color = { 1.f, 1.f, 1.f };
 			intensity = 1;
 		}

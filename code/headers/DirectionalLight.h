@@ -21,6 +21,8 @@ namespace MGVisualizer
 
 		DirectionalLight(glm::vec3 initialDirection)
 		{
+			type = Directional;
+
 			direction = initialDirection;
 		}
 	};

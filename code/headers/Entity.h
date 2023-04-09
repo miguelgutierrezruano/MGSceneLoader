@@ -9,6 +9,7 @@
 #include <Color_Buffer.hpp>
 #include "Transform.h"
 #include "Mesh.h"
+#include "Light.h"
 
 #include <assimp/Importer.hpp>
 #include <assimp/scene.h>
@@ -48,7 +49,11 @@ namespace MGVisualizer
 
 	private:
 
+		mat4 get_parent_matrix();
+
 		void load_model_nodes(const char* model_path);
+
+		Color compute_lightning(const Color& vertexColor, const vec4& vertex, const vec4& normal, vector< Light >& lights);
 
 		void copy_nodes_recursive(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform);
 		void copy_meshes(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform);

@@ -16,148 +16,6 @@ namespace MGVisualizer
 		load_model_nodes(model_path);
 	}
 
-    void Entity::update(mat4 projection)
-    {
-        // Apply parent and projection transformations
-        mat4 parentMatrix = mat4(1);
-
-        // Get parent matrix
-        if (parent != nullptr)
-        {
-            Entity* parentIt = parent;
-            parentMatrix *= parentIt->get_transform()->get_matrix();
-
-            while (parentIt != nullptr)
-            {
-                parentIt = parentIt->get_parent();
-
-                if (parentIt != nullptr)
-                    parentMatrix *= parentIt->get_transform()->get_matrix();
-            }
-        }
-
-        mat4 transformation = projection * parentMatrix * transform.get_matrix();
-
-        size_t meshes_number = meshes.size();
-
-        // Iterate all meshes
-        for (int i = 0; i < meshes_number; i++)
-        {
-            Mesh* mesh = &meshes[i];
-
-            size_t number_of_vertices = mesh->original_vertices.size();
-
-            // Transform every vertex by transformation matrix
-            for (size_t index = 0; index < number_of_vertices; index++)
-            {
-                // Save transformed vertex in transformed vertices vector
-                vec4& vertex = mesh->transformed_vertices.at(index) =
-                    transformation * mesh->original_vertices.at(index);
-
-                mesh->transformed_normals.at(index) =
-                    transformation * mesh->original_normals.at(index);
-
-                // Give w value 1 back, normalize it by dividing
-
-                float divisor = 1.f / vertex.w;
-
-                vertex.x *= divisor;
-                vertex.y *= divisor;
-                vertex.z *= divisor;
-                vertex.w = 1.f;
-            }
-        }
-    }
-
-    // Give vector of lights
-    void Entity::render(mat4 transformation, View* view)
-    {
-        float ambientIntensity = view->get_lights().at(0).get_intensity() * 0.1f;
-        Color ambientColor = view->get_lights().at(0).get_color();
-
-        vec3 ambientColorIntensity =
-            vec3(ambientColor.red() * ambientIntensity / 255, ambientColor.green() * ambientIntensity / 255, ambientColor.blue() * ambientIntensity/ 255);
-
-        size_t meshes_number = meshes.size();
-
-        // Iterate all meshes
-        for (int i = 0; i < meshes_number; i++)
-        {
-            Mesh* mesh = &meshes[i];
-
-            size_t number_of_vertices = mesh->transformed_vertices.size();
-
-            // Transform every vertex of the mesh to view 
-            for (size_t index = 0; index < number_of_vertices; index++)
-            {
-                mesh->display_vertices.at(index) =
-                    ivec4(transformation * mesh->transformed_vertices.at(index));
-            }
-
-            // Compute lightning and set color
-            for (size_t index = 0; index < number_of_vertices; index++)
-            {
-                Color vertexColor = mesh->original_colors.at(index);
-
-                vec3 result = vec3(vertexColor.red() * ambientColorIntensity.r / 255,
-                                        vertexColor.green() * ambientColorIntensity.g / 255,
-                                        vertexColor.blue() * ambientColorIntensity.b / 255);
-
-                mesh->computed_colors.at(index) =
-                    Color(result.r, result.g, result.b);
-            }
-
-            // Create size pointers
-            int* indices = mesh->original_indices.data();
-            int* end = indices + mesh->original_indices.size();
-
-            vector< int > clip_indices;
-
-            for (; indices < end; indices += 3)
-            {
-                if (view->is_frontface(mesh->transformed_vertices.data(), indices))
-                {
-                    // Set color with the mean of the three vertexes
-                    view->set_rasterizer_color(mesh->computed_colors.at(*indices));
-
-                    bool inside = true;
-
-                    // Clip vertices
-                    for (auto index = indices; index < indices + 3; index++)
-                    {
-                        if (mesh->display_vertices.at(*index).x > (int)view->width ||
-                            mesh->display_vertices.at(*index).x < 0 ||
-                            mesh->display_vertices.at(*index).y > (int)view->height ||
-                            mesh->display_vertices.at(*index).y < 0)
-                            inside = false;
-                    }
-
-                    if(inside)
-                        view->rasterizer_fill_polygon(mesh->display_vertices.data(), indices, indices + 3);
-                    //else
-                    //{
-                    //    auto clipped_vertices = clip_triangle(mesh->display_vertices.data(), indices, view->width, view->height);
-
-                    //    if (clipped_vertices.size() > 0)
-                    //    {
-                    //        clip_indices.clear();
-                    //        clip_indices.reserve(clipped_vertices.size());
-
-                    //        for (int i = 0; i < (int)clipped_vertices.size(); i++)
-                    //            clip_indices.push_back(i);
-
-                    //        const int* clip_start = clip_indices.data();
-                    //        const int* clip_end = clip_start + clip_indices.size();
-
-                    //        // Commented until doubts are resolved
-                    //        view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
-                    //    }
-                    //}
-                }
-            }
-        }
-    }
-
     void Entity::load_model_nodes(const char* model_path)
     {
         Assimp::Importer importer;
@@ -260,6 +118,172 @@ namespace MGVisualizer
 
             meshes.push_back(mgMesh);
         }
+    }
+
+    void Entity::update(mat4 projection)
+    {
+        // Apply parent and projection transformations
+        mat4 parentMatrix = get_parent_matrix();
+
+        mat4 transformation = projection * parentMatrix * transform.get_matrix();
+
+        size_t meshes_number = meshes.size();
+
+        // Iterate all meshes
+        for (int i = 0; i < meshes_number; i++)
+        {
+            Mesh* mesh = &meshes[i];
+
+            size_t number_of_vertices = mesh->original_vertices.size();
+
+            // Transform every vertex by transformation matrix
+            for (size_t index = 0; index < number_of_vertices; index++)
+            {
+                // Save transformed vertex in transformed vertices vector
+                vec4& vertex = mesh->transformed_vertices.at(index) =
+                    transformation * mesh->original_vertices.at(index);
+
+                // Since we only need world normals we dont multiply projection?
+                vec4& normal = mesh->transformed_normals.at(index) =
+                    parentMatrix * transform.get_matrix() * mesh->original_normals.at(index);
+
+                // Normalize vertex
+                float divisor = 1.f / vertex.w;
+
+                vertex.x *= divisor;
+                vertex.y *= divisor;
+                vertex.z *= divisor;
+                vertex.w = 1.f;
+
+                // Normalize normal
+                vec3 normalizedNormal = normalize(vec3(normal.x, normal.y, normal.z));
+                normal = vec4(normalizedNormal.x, normalizedNormal.y, normalizedNormal.z, 0.f);
+            }
+        }
+    }
+
+    // Give vector of lights
+    void Entity::render(mat4 transformation, View* view)
+    {
+        size_t meshes_number = meshes.size();
+
+        // Iterate all meshes
+        for (int i = 0; i < meshes_number; i++)
+        {
+            Mesh* mesh = &meshes[i];
+
+            size_t number_of_vertices = mesh->transformed_vertices.size();
+
+            // Transform every vertex of the mesh to view 
+            for (size_t index = 0; index < number_of_vertices; index++)
+            {
+                mesh->display_vertices.at(index) =
+                    ivec4(transformation * mesh->transformed_vertices.at(index));
+            }
+
+            // Compute lightning and set color
+            for (size_t index = 0; index < number_of_vertices; index++)
+            {
+                // Compute lightning needs: Vertex world position, light vector, normal world position, vertex color
+                mesh->computed_colors.at(index) = compute_lightning(mesh->original_colors.at(index),
+                    get_parent_matrix() * transform.get_matrix() * mesh->original_vertices.at(index), // World vertex
+                    mesh->transformed_normals.at(index),
+                    view->get_lights());
+
+                //mesh->computed_colors.at(index) = mesh->original_colors.at(index);
+            }
+
+            // Create size pointers
+            int* indices = mesh->original_indices.data();
+            int* end = indices + mesh->original_indices.size();
+
+            vector< int > clip_indices;
+
+            for (; indices < end; indices += 3)
+            {
+                if (view->is_frontface(mesh->transformed_vertices.data(), indices))
+                {
+                    // Set color with the mean of the three vertexes
+                    view->set_rasterizer_color(mesh->computed_colors.at(*indices));
+
+                    bool inside = true;
+
+                    // Clip vertices
+                    for (auto index = indices; index < indices + 3; index++)
+                    {
+                        if (mesh->display_vertices.at(*index).x > (int)view->width ||
+                            mesh->display_vertices.at(*index).x < 0 ||
+                            mesh->display_vertices.at(*index).y > (int)view->height ||
+                            mesh->display_vertices.at(*index).y < 0)
+                            inside = false;
+                    }
+
+                    if(inside)
+                        view->rasterizer_fill_polygon(mesh->display_vertices.data(), indices, indices + 3);
+                    //else
+                    //{
+                    //    auto clipped_vertices = clip_triangle(mesh->display_vertices.data(), indices, view->width, view->height);
+
+                    //    if (clipped_vertices.size() > 0)
+                    //    {
+                    //        clip_indices.clear();
+                    //        clip_indices.reserve(clipped_vertices.size());
+
+                    //        for (int i = 0; i < (int)clipped_vertices.size(); i++)
+                    //            clip_indices.push_back(i);
+
+                    //        const int* clip_start = clip_indices.data();
+                    //        const int* clip_end = clip_start + clip_indices.size();
+
+                    //        // Commented until doubts are resolved
+                    //        view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
+                    //    }
+                    //}
+                }
+            }
+        }
+    }
+
+    mat4 Entity::get_parent_matrix()
+    {
+        // Apply parent and projection transformations
+        mat4 parentMatrix = mat4(1);
+
+        // Get parent matrix
+        if (parent != nullptr)
+        {
+            Entity* parentIt = parent;
+            parentMatrix *= parentIt->get_transform()->get_matrix();
+
+            while (parentIt != nullptr)
+            {
+                parentIt = parentIt->get_parent();
+
+                if (parentIt != nullptr)
+                    parentMatrix *= parentIt->get_transform()->get_matrix();
+            }
+        }
+
+        return parentMatrix;
+    }
+
+    Entity::Color Entity::compute_lightning(const Color& vertexColor, const vec4& vertex, const vec4& normal, vector<Light>& lights)
+    {
+        const float inverse255 = 1.f / 255.f;
+
+        // Get ambient light
+        float ambientIntensity = lights.at(0).get_intensity();
+        Color ambientColor = lights.at(0).get_color();
+
+        vec3 ambientLight = vec3(ambientColor.red() * ambientIntensity * inverse255,
+            ambientColor.green() * ambientIntensity * inverse255,
+            ambientColor.blue() * ambientIntensity * inverse255);
+
+        vec3 result = vec3(vertexColor.red() * ambientLight.r * inverse255,
+            vertexColor.green() * ambientLight.g * inverse255,
+            vertexColor.blue() * ambientLight.b * inverse255);
+
+        return Color(result.r, result.g, result.b);
     }
 
     // Apply Sutherland-Hodgman algorithm

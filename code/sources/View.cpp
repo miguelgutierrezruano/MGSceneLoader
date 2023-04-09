@@ -50,6 +50,11 @@ namespace MGVisualizer
 
         camera.transform.set_position(vec3(0, 0, 0));
 
+        Light ambientLight;
+        ambientLight.set_intensity(0.1f);
+
+        lights.push_back(ambientLight);
+
         DirectionalLight dirLight(vec3(0, 0.5f, 0.5f));
         lights.push_back(dirLight);
 
