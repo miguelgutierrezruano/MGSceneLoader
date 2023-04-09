@@ -25,5 +25,9 @@ namespace MGVisualizer
 
 			direction = initialDirection;
 		}
+
+	public:
+
+		glm::vec3 get_direction() { return direction; }
 	};
 }

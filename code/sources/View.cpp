@@ -50,13 +50,13 @@ namespace MGVisualizer
 
         camera.transform.set_position(vec3(0, 0, 0));
 
-        Light ambientLight;
-        ambientLight.set_intensity(0.1f);
+        Light* ambientLight = new Light();
+        ambientLight->set_intensity(0.4f);
 
         lights.push_back(ambientLight);
 
-        DirectionalLight dirLight(vec3(0, 0.5f, 0.5f));
-        lights.push_back(dirLight);
+        DirectionalLight* dirLight = new DirectionalLight(vec3(0, 0.f, -1.f));
+        //lights.push_back(dirLight);
 
         mouseLastPosition = vec2();
     }

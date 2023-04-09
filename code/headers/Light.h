@@ -51,6 +51,8 @@ namespace MGVisualizer
 			color = { 1.f, 1.f, 1.f };
 			intensity = 1;
 		}
+
+		virtual void method() { }
 	};
 }
 

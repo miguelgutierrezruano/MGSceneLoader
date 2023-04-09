@@ -37,7 +37,7 @@ namespace MGVisualizer
         Camera camera;
 		map< std::string, Entity* > entities;
 
-        vector< Light > lights;
+        vector< Light* > lights;
 
         Color_Buffer               color_buffer;
         Rasterizer< Color_Buffer > rasterizer;
@@ -64,7 +64,7 @@ namespace MGVisualizer
             const int* const indices_begin,
             const int* const indices_end);
 
-        vector< Light >& get_lights() { return lights; }
+        vector< Light* >& get_lights() { return lights; }
         
         bool  is_frontface(const vec4* const projected_vertices, const int* const indices);
     };

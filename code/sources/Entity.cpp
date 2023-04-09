@@ -204,19 +204,28 @@ namespace MGVisualizer
                 if (view->is_frontface(mesh->transformed_vertices.data(), indices))
                 {
                     // Set color with the mean of the three vertexes
-                    view->set_rasterizer_color(mesh->computed_colors.at(*indices));
+                    Color polygonColor(0, 0, 0);
 
                     bool inside = true;
 
-                    // Clip vertices
                     for (auto index = indices; index < indices + 3; index++)
                     {
+                        polygonColor = Color(polygonColor.red() + mesh->computed_colors.at(*index).red(),
+                            polygonColor.green() + mesh->computed_colors.at(*index).green(),
+                            polygonColor.blue() + mesh->computed_colors.at(*index).blue());
+
+                        // Clip vertices
                         if (mesh->display_vertices.at(*index).x > (int)view->width ||
                             mesh->display_vertices.at(*index).x < 0 ||
                             mesh->display_vertices.at(*index).y > (int)view->height ||
                             mesh->display_vertices.at(*index).y < 0)
                             inside = false;
                     }
+
+                    //polygonColor = Color(polygonColor.red() / 3, polygonColor.green() / 3, polygonColor.blue() / 3);
+                    polygonColor = mesh->computed_colors.at(*indices);
+
+                    view->set_rasterizer_color(polygonColor);
 
                     if(inside)
                         view->rasterizer_fill_polygon(mesh->display_vertices.data(), indices, indices + 3);
@@ -267,23 +276,61 @@ namespace MGVisualizer
         return parentMatrix;
     }
 
-    Entity::Color Entity::compute_lightning(const Color& vertexColor, const vec4& vertex, const vec4& normal, vector<Light>& lights)
+    Entity::Color Entity::compute_lightning(const Color& vertexColor, const vec4& vertex, const vec4& normal, vector<Light*>& lights)
     {
         const float inverse255 = 1.f / 255.f;
 
-        // Get ambient light
-        float ambientIntensity = lights.at(0).get_intensity();
-        Color ambientColor = lights.at(0).get_color();
+        vec3 result = vec3(0, 0, 0);
 
-        vec3 ambientLight = vec3(ambientColor.red() * ambientIntensity * inverse255,
-            ambientColor.green() * ambientIntensity * inverse255,
-            ambientColor.blue() * ambientIntensity * inverse255);
+        for (size_t i = 0; i < lights.size(); i++)
+        {
+            switch (lights[i]->get_type())
+            {
+                case Light::Ambient:
+                {
+                    // Get ambient light
+                    float ambientIntensity = lights[i]->get_intensity();
+                    Color ambientColor = lights[i]->get_color();
 
-        vec3 result = vec3(vertexColor.red() * ambientLight.r * inverse255,
-            vertexColor.green() * ambientLight.g * inverse255,
-            vertexColor.blue() * ambientLight.b * inverse255);
+                    vec3 ambientLight = vec3(ambientColor.red() * ambientIntensity * inverse255,
+                        ambientColor.green() * ambientIntensity * inverse255,
+                        ambientColor.blue() * ambientIntensity * inverse255);
 
-        return Color(result.r, result.g, result.b);
+                    result += vec3(ambientLight.r * inverse255,
+                        ambientLight.g * inverse255,
+                        ambientLight.b * inverse255);
+                }
+                break;
+
+                case Light::Directional:
+                {
+                    // Get light
+                    DirectionalLight* dirLight = dynamic_cast<DirectionalLight*>(lights.at(i));
+
+                    float dirIntensity = dirLight->get_intensity();
+                    Color dirColor = dirLight->get_color();
+
+                    vec3 directionalLightColor = vec3(dirColor.red() * dirIntensity * inverse255,
+                        dirColor.green() * dirIntensity * inverse255,
+                        dirColor.blue() * dirIntensity * inverse255);
+
+                    float diff = max(dot(vec3(normal.x, normal.y, normal.z), dirLight->get_direction()), 0.f);
+
+                    if (diff != 0)
+                        int a = 0;
+
+                    vec3 diffuse = diff * directionalLightColor;
+
+                    result += diffuse;
+                }
+                break;
+
+                default:
+                    break;
+            }
+        }
+
+        return Color(result.r * vertexColor.red(), result.g * vertexColor.green(), result.b * vertexColor.blue());
     }
 
     // Apply Sutherland-Hodgman algorithm
