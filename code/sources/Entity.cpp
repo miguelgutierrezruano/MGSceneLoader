@@ -143,7 +143,7 @@ namespace MGVisualizer
         auto scene = importer.ReadFile
         (
             model_path,
-            aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType // Generate normals with assimp
+            aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType | aiProcess_GenNormals
         );
 
         if (scene && scene->mNumMeshes > 0)
@@ -184,7 +184,9 @@ namespace MGVisualizer
 
             mgMesh.original_vertices.resize(vertices_number);
             mgMesh.original_colors.resize(vertices_number);
+            mgMesh.original_normals.resize(vertices_number);
             mgMesh.transformed_vertices.resize(vertices_number);
+            mgMesh.transformed_normals.resize(vertices_number);
             mgMesh.display_vertices.resize(vertices_number);
 
             // Get number of triangles and resize proper vectors
@@ -211,6 +213,9 @@ namespace MGVisualizer
 
                 // Copy color coordinates
                 mgMesh.original_colors[index].set(diffuse_color.r, diffuse_color.g, diffuse_color.b);
+
+                auto& normal = mesh->mNormals[index];
+                mgMesh.original_normals[index] = vec4(normal.x, normal.y, normal.z, 0.f);
             }
 
             auto indices_iterator = mgMesh.original_indices.begin();
