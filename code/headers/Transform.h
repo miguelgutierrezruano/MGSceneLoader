@@ -40,6 +40,8 @@ namespace MGVisualizer
 		void set_rotation(vec3 newRotation) { rotation = newRotation; update_matrix(); }
 		void set_scale(vec3 newScale) { scale = newScale; update_matrix(); }
 
+		void set_transformation(mat4 newTransformation);
+
 		const vec3 get_forward();
 		const vec3 get_right();
 		const vec3 get_up();

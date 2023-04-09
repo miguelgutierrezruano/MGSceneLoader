@@ -6,10 +6,6 @@
 #include "Entity.h"
 #include "View.h"
 
-#include <assimp/Importer.hpp>
-#include <assimp/scene.h>
-#include <assimp/postprocess.h>
-
 namespace MGVisualizer
 {
 	Entity::Entity(const char* model_path, Entity* parent_entity, vec3 position, vec3 rotation, vec3 scale)
@@ -42,19 +38,21 @@ namespace MGVisualizer
 
         mat4 transformation = projection * parentMatrix * transform.get_matrix();
 
-        size_t meshes_number = original_vertices.size();
+        size_t meshes_number = meshes.size();
 
         // Iterate all meshes
         for (int i = 0; i < meshes_number; i++)
         {
-            size_t number_of_vertices = original_vertices[i].size();
+            Mesh* mesh = &meshes[i];
+
+            size_t number_of_vertices = mesh->original_vertices.size();
 
             // Transform every vertex by transformation matrix
             for (size_t index = 0; index < number_of_vertices; index++)
             {
                 // Save transformed vertex in transformed vertices vector
-                vec4& vertex = transformed_vertices[i].at(index) =
-                    transformation * original_vertices[i].at(index);
+                vec4& vertex = mesh->transformed_vertices.at(index) =
+                    transformation * mesh->transform.get_matrix() * mesh->original_vertices.at(index);
 
                 // Give w value 1 back, normalize it by dividing
 
@@ -70,67 +68,69 @@ namespace MGVisualizer
 
     void Entity::render(mat4 transformation, View* view)
     {
-        size_t meshes_number = original_vertices.size();
+        size_t meshes_number = meshes.size();
 
         // Iterate all meshes
         for (int i = 0; i < meshes_number; i++)
         {
-            size_t number_of_vertices = transformed_vertices[i].size();
+            Mesh* mesh = &meshes[i];
+
+            size_t number_of_vertices = mesh->transformed_vertices.size();
 
             // Transform every vertex of the mesh to view 
             for (size_t index = 0; index < number_of_vertices; index++)
             {
-                display_vertices[i].at(index) =
-                    ivec4(transformation * transformed_vertices[i].at(index));
+                mesh->display_vertices.at(index) =
+                    ivec4(transformation * mesh->transformed_vertices.at(index));
             }
 
             // Create size pointers
-            int* indices = original_indices[i].data();
-            int* end = indices + original_indices[i].size();
+            int* indices = mesh->original_indices.data();
+            int* end = indices + mesh->original_indices.size();
 
             vector< int > clip_indices;
 
             for (; indices < end; indices += 3)
             {
-                if (view->is_frontface(transformed_vertices[i].data(), indices))
+                if (view->is_frontface(mesh->transformed_vertices.data(), indices))
                 {
                     // Se establece el color del polígono a partir del color de su primer vértice:
 
-                    view->set_rasterizer_color(original_colors[i].at(*indices));
+                    view->set_rasterizer_color(mesh->original_colors.at(*indices));
 
                     bool inside = true;
 
                     // Clip vertices
                     for (auto index = indices; index < indices + 3; index++)
                     {
-                        if (display_vertices[i].at(*index).x > (int)view->width ||
-                            display_vertices[i].at(*index).x < 0 ||
-                            display_vertices[i].at(*index).y > (int)view->height ||
-                            display_vertices[i].at(*index).y < 0)
+                        if (mesh->display_vertices.at(*index).x > (int)view->width ||
+                            mesh->display_vertices.at(*index).x < 0 ||
+                            mesh->display_vertices.at(*index).y > (int)view->height ||
+                            mesh->display_vertices.at(*index).y < 0)
                             inside = false;
                     }
 
                     if(inside)
-                        view->rasterizer_fill_polygon(display_vertices[i].data(), indices, indices + 3);
-                    else
-                    {
-                        auto clipped_vertices = clip_triangle(display_vertices[i].data(), indices, view->width, view->height);
+                        view->rasterizer_fill_polygon(mesh->display_vertices.data(), indices, indices + 3);
+                    //else
+                    //{
+                    //    auto clipped_vertices = clip_triangle(mesh->display_vertices.data(), indices, view->width, view->height);
 
-                        if (clipped_vertices.size() > 0)
-                        {
-                            clip_indices.clear();
-                            clip_indices.reserve(clipped_vertices.size());
+                    //    if (clipped_vertices.size() > 0)
+                    //    {
+                    //        clip_indices.clear();
+                    //        clip_indices.reserve(clipped_vertices.size());
 
-                            for (int i = 0; i < (int)clipped_vertices.size(); i++)
-                                clip_indices.push_back(i);
+                    //        for (int i = 0; i < (int)clipped_vertices.size(); i++)
+                    //            clip_indices.push_back(i);
 
-                            const int* clip_start = clip_indices.data();
-                            const int* clip_end = clip_start + clip_indices.size();
+                    //        const int* clip_start = clip_indices.data();
+                    //        const int* clip_end = clip_start + clip_indices.size();
 
-                            // Commented until doubts are resolved
-                            //view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
-                        }
-                    }
+                    //        // Commented until doubts are resolved
+                    //        //view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
+                    //    }
+                    //}
                 }
             }
         }
@@ -152,30 +152,33 @@ namespace MGVisualizer
         {
             size_t sceneMeshes = scene->mNumMeshes;
 
-            original_vertices.resize(sceneMeshes);
-            original_colors.resize(sceneMeshes);
-            transformed_vertices.resize(sceneMeshes);
-            display_vertices.resize(sceneMeshes);
-            original_indices.resize(sceneMeshes);
+            meshes.resize(sceneMeshes);
 
             // Loop all meshes
             for (unsigned i = 0; i < scene->mNumMeshes; i++)
             {
+                Mesh mgMesh;
+
                 auto mesh = scene->mMeshes[i];
-                auto root = scene->mRootNode;
+                auto meshNode = scene->mRootNode->FindNode(mesh->mName);
+
+                if (meshNode)
+                {
+                    mgMesh.transform.set_transformation(aiToGlm(meshNode->mTransformation));
+                }
 
                 // Get number of vertices and resize proper vectors
                 size_t vertices_number = mesh->mNumVertices;
 
-                original_vertices[i].resize(vertices_number);
-                original_colors[i].resize(vertices_number);
-                transformed_vertices[i].resize(vertices_number);
-                display_vertices[i].resize(vertices_number);
+                mgMesh.original_vertices.resize(vertices_number);
+                mgMesh.original_colors.resize(vertices_number);
+                mgMesh.transformed_vertices.resize(vertices_number);
+                mgMesh.display_vertices.resize(vertices_number);
 
                 // Get number of triangles and resize proper vectors
                 size_t triangles_number = mesh->mNumFaces;
 
-                original_indices[i].resize(triangles_number * 3);
+                mgMesh.original_indices.resize(triangles_number * 3);
 
                 // Get color of mesh
                 aiColor4D diffuse_color;
@@ -189,13 +192,13 @@ namespace MGVisualizer
                 {
                     // Copy vertex coordinates
                     auto& vertex = mesh->mVertices[index];
-                    original_vertices[i][index] = vec4(vertex.x, vertex.y, vertex.z, 1.f);
+                    mgMesh.original_vertices[index] = vec4(vertex.x, vertex.y, vertex.z, 1.f);
 
                     // Copy color coordinates
-                    original_colors[i][index].set(diffuse_color.r, diffuse_color.g, diffuse_color.b);
+                    mgMesh.original_colors[index].set(diffuse_color.r, diffuse_color.g, diffuse_color.b);
                 }
 
-                auto indices_iterator = original_indices[i].begin();
+                auto indices_iterator = mgMesh.original_indices.begin();
 
                 // Generate indexes of triangles
                 for (size_t index = 0; index < mesh->mNumFaces; index++)
@@ -211,6 +214,8 @@ namespace MGVisualizer
                     *indices_iterator++ = (int(indices[1]));
                     *indices_iterator++ = (int(indices[2]));
                 }
+
+                meshes.push_back(mgMesh);
             }
         }
     }
@@ -414,5 +419,15 @@ namespace MGVisualizer
         }
 
         return result;
+    }
+
+    mat4 Entity::aiToGlm(const aiMatrix4x4& from)
+    {
+        glm::mat4 to;
+        to[0][0] = from.a1; to[0][1] = from.b1; to[0][2] = from.c1; to[0][3] = from.d1;
+        to[1][0] = from.a2; to[1][1] = from.b2; to[1][2] = from.c2; to[1][3] = from.d2;
+        to[2][0] = from.a3; to[2][1] = from.b3; to[2][2] = from.c3; to[2][3] = from.d3;
+        to[3][0] = from.a4; to[3][1] = from.b4; to[3][2] = from.c4; to[3][3] = from.d4;
+        return to;
     }
 }

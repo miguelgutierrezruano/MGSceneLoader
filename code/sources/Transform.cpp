@@ -25,6 +25,11 @@ namespace MGVisualizer
 		update_matrix();
 	}
 
+	void Transform::set_transformation(mat4 newTransformation)
+	{
+		transformationMatrix = newTransformation;
+	}
+
 	const vec3 Transform::get_forward()
 	{
 		mat4 rotationMatrix = mat4(1);

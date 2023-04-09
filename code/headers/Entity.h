@@ -8,6 +8,11 @@
 #include <vector>
 #include <Color_Buffer.hpp>
 #include "Transform.h"
+#include "Mesh.h"
+
+#include <assimp/Importer.hpp>
+#include <assimp/scene.h>
+#include <assimp/postprocess.h>
 
 namespace MGVisualizer
 {
@@ -29,11 +34,7 @@ namespace MGVisualizer
 		Transform transform;
 
 		// Mesh vectors foreach mesh of the model
-		vector< vector <  vec4 > > original_vertices;
-		vector< vector <   int > > original_indices;
-		vector< vector < Color > > original_colors;
-		vector< vector <  vec4 > > transformed_vertices;
-		vector< vector < ivec4 > > display_vertices;
+		vector < Mesh > meshes;
 
 		// Normals and computed colors
 
@@ -59,5 +60,7 @@ namespace MGVisualizer
 		vector< ivec4 > clip_right (const vector<ivec4>& polygon, int xMax);
 		vector< ivec4 > clip_bottom(const vector<ivec4>& polygon, int yMin);
 		vector< ivec4 > clip_top   (const vector<ivec4>& polygon, int yMax);
+
+		mat4 aiToGlm(const aiMatrix4x4& from);
 	};
 }
