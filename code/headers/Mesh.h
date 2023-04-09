@@ -39,6 +39,6 @@ namespace MGVisualizer
 
 	public:
 
-		Mesh();
+		Mesh() { }
 	};
 }

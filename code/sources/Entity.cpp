@@ -128,7 +128,7 @@ namespace MGVisualizer
                     //        const int* clip_end = clip_start + clip_indices.size();
 
                     //        // Commented until doubts are resolved
-                    //        //view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
+                    //        view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
                     //    }
                     //}
                 }
@@ -163,7 +163,7 @@ namespace MGVisualizer
             copy_meshes(node, scene, parentTransform);
         }
 
-        for (int i = 0; i < node->mNumChildren; i++)
+        for (unsigned i = 0; i < node->mNumChildren; i++)
         {
             copy_nodes_recursive(node->mChildren[i], scene, parentTransform * node->mTransformation);
         }
@@ -171,10 +171,11 @@ namespace MGVisualizer
 
     void Entity::copy_meshes(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform)
     {
-        // Make a MGMesh for each mesh in node
-        for (int i = 0; i < node->mNumMeshes; i++)
+        for (unsigned i = 0; i < node->mNumMeshes; i++)
         {
+            // Make a MGMesh for each mesh in node
             Mesh mgMesh;
+
             // Get mesh
             aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
 

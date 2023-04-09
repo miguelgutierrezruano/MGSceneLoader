@@ -70,7 +70,8 @@ namespace MGVisualizer
 
 		void clear()
 		{
-			color_buffer.clear({ 0, 0.6f, 1.f });
+			//color_buffer.clear({ 0.f, 0.6f, 1.f });
+			color_buffer.clear({ 1.f, 0.68f, 0.35f });
 
 			for (int* z = z_buffer.data(), *end = z + z_buffer.size(); z != end; z++)
 			{
