@@ -41,22 +41,22 @@ namespace MGVisualizer
         entities["deer"]->get_transform()->set_rotation(vec3(0, 90, 0.f));
         entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));
 
-        Entity* japan = new Entity("../binaries/japan.fbx");
+        /*Entity* japan = new Entity("../binaries/japan.fbx");
         entities.emplace("japan", japan);
 
         entities["japan"]->get_transform()->set_position(vec3(0.f, -30.f, 100.f));
         entities["japan"]->get_transform()->set_rotation(vec3(0, 180, 0.f));
-        entities["japan"]->get_transform()->set_scale(vec3(0.1f, 0.1f, 0.1f));
+        entities["japan"]->get_transform()->set_scale(vec3(0.1f, 0.1f, 0.1f));*/
 
         camera.transform.set_position(vec3(0, 0, 0));
 
         Light* ambientLight = new Light();
-        ambientLight->set_intensity(0.4f);
+        ambientLight->set_intensity(0.1f);
 
         lights.push_back(ambientLight);
 
-        DirectionalLight* dirLight = new DirectionalLight(vec3(0, 0.f, -1.f));
-        //lights.push_back(dirLight);
+        DirectionalLight* dirLight = new DirectionalLight(vec3(0, 1.f, 0.f));
+        lights.push_back(dirLight);
 
         mouseLastPosition = vec2();
     }

@@ -210,6 +210,7 @@ namespace MGVisualizer
 
                     for (auto index = indices; index < indices + 3; index++)
                     {
+                        // When converted to float colors go random
                         polygonColor = Color(polygonColor.red() + mesh->computed_colors.at(*index).red(),
                             polygonColor.green() + mesh->computed_colors.at(*index).green(),
                             polygonColor.blue() + mesh->computed_colors.at(*index).blue());
@@ -222,8 +223,8 @@ namespace MGVisualizer
                             inside = false;
                     }
 
-                    //polygonColor = Color(polygonColor.red() / 3, polygonColor.green() / 3, polygonColor.blue() / 3);
-                    polygonColor = mesh->computed_colors.at(*indices);
+                    polygonColor = Color(polygonColor.red() / 3, polygonColor.green() / 3, polygonColor.blue() / 3);
+                    //polygonColor = mesh->computed_colors.at(*indices);
 
                     view->set_rasterizer_color(polygonColor);
 
