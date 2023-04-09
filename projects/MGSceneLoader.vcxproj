@@ -89,12 +89,14 @@
     <ClCompile Include="..\code\sources\Camera.cpp" />
     <ClCompile Include="..\code\sources\Entity.cpp" />
     <ClCompile Include="..\code\sources\main.cpp" />
+    <ClCompile Include="..\code\sources\Mesh.cpp" />
     <ClCompile Include="..\code\sources\Transform.cpp" />
     <ClCompile Include="..\code\sources\View.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\headers\Camera.h" />
     <ClInclude Include="..\code\headers\Entity.h" />
+    <ClInclude Include="..\code\headers\Mesh.h" />
     <ClInclude Include="..\code\headers\Rasterizer.h" />
     <ClInclude Include="..\code\headers\Transform.h" />
     <ClInclude Include="..\code\headers\View.h" />

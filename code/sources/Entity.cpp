@@ -127,7 +127,8 @@ namespace MGVisualizer
                             const int* clip_start = clip_indices.data();
                             const int* clip_end = clip_start + clip_indices.size();
 
-                            view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
+                            // Commented until doubts are resolved
+                            //view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
                         }
                     }
                 }
@@ -142,7 +143,7 @@ namespace MGVisualizer
         auto scene = importer.ReadFile
         (
             model_path,
-            aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType
+            aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType // Generate normals with assimp
         );
 
         // If scene is null file could not be loaded
@@ -161,6 +162,7 @@ namespace MGVisualizer
             for (unsigned i = 0; i < scene->mNumMeshes; i++)
             {
                 auto mesh = scene->mMeshes[i];
+                auto root = scene->mRootNode;
 
                 // Get number of vertices and resize proper vectors
                 size_t vertices_number = mesh->mNumVertices;

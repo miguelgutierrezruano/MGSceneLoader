@@ -24,7 +24,7 @@ namespace MGVisualizer
         color_buffer(width, height),
         rasterizer(color_buffer)
     { 
-        Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
+        /*Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
         entities.emplace("rabbit", rabbit);
 
         entities["rabbit"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
@@ -39,7 +39,7 @@ namespace MGVisualizer
 
         entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 40.f));
         entities["deer"]->get_transform()->set_rotation(vec3(0, 90, 0.f));
-        entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));
+        entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));*/
 
         /*Entity* mcCree = new Entity("../binaries/mccree.blend");
         entities.emplace("mccree", mcCree);
@@ -48,12 +48,12 @@ namespace MGVisualizer
         entities["mccree"]->get_transform()->set_rotation(vec3(270, 90, 0.f));
         entities["mccree"]->get_transform()->set_scale(vec3(0.5f, 0.5f, 0.5f));*/
 
-        /*Entity* ufo = new Entity("../binaries/UFO.fbx");
+        Entity* ufo = new Entity("../binaries/UFO.fbx");
         entities.emplace("ufo", ufo);
 
         entities["ufo"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
         entities["ufo"]->get_transform()->set_rotation(vec3(270, 270, 0.f));
-        entities["ufo"]->get_transform()->set_scale(vec3(0.1f, 0.1f, 0.1f));*/
+        entities["ufo"]->get_transform()->set_scale(vec3(0.5f, 0.5f, 0.5f));
 
         camera.transform.set_position(vec3(0, 0, 0));
     }
