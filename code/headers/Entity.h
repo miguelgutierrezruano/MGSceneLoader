@@ -36,8 +36,6 @@ namespace MGVisualizer
 		// Mesh vectors foreach mesh of the model
 		vector < Mesh > meshes;
 
-		// Normals and computed colors
-
 	public:
 
 		Entity(const char* model_path, Entity* parent_entity = nullptr, vec3 position = vec3(), vec3 rotation = vec3(), vec3 scale = vec3(1.f, 1.f, 1.f));

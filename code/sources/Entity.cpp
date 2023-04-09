@@ -54,6 +54,9 @@ namespace MGVisualizer
                 vec4& vertex = mesh->transformed_vertices.at(index) =
                     transformation * mesh->original_vertices.at(index);
 
+                mesh->transformed_normals.at(index) =
+                    transformation * mesh->original_normals.at(index);
+
                 // Give w value 1 back, normalize it by dividing
 
                 float divisor = 1.f / vertex.w;
@@ -66,8 +69,15 @@ namespace MGVisualizer
         }
     }
 
+    // Give vector of lights
     void Entity::render(mat4 transformation, View* view)
     {
+        float ambientIntensity = view->get_lights().at(0).get_intensity() * 0.1f;
+        Color ambientColor = view->get_lights().at(0).get_color();
+
+        vec3 ambientColorIntensity =
+            vec3(ambientColor.red() * ambientIntensity / 255, ambientColor.green() * ambientIntensity / 255, ambientColor.blue() * ambientIntensity/ 255);
+
         size_t meshes_number = meshes.size();
 
         // Iterate all meshes
@@ -84,6 +94,19 @@ namespace MGVisualizer
                     ivec4(transformation * mesh->transformed_vertices.at(index));
             }
 
+            // Compute lightning and set color
+            for (size_t index = 0; index < number_of_vertices; index++)
+            {
+                Color vertexColor = mesh->original_colors.at(index);
+
+                vec3 result = vec3(vertexColor.red() * ambientColorIntensity.r / 255,
+                                        vertexColor.green() * ambientColorIntensity.g / 255,
+                                        vertexColor.blue() * ambientColorIntensity.b / 255);
+
+                mesh->computed_colors.at(index) =
+                    Color(result.r, result.g, result.b);
+            }
+
             // Create size pointers
             int* indices = mesh->original_indices.data();
             int* end = indices + mesh->original_indices.size();
@@ -94,9 +117,8 @@ namespace MGVisualizer
             {
                 if (view->is_frontface(mesh->transformed_vertices.data(), indices))
                 {
-                    // Se establece el color del polígono a partir del color de su primer vértice:
-
-                    view->set_rasterizer_color(mesh->original_colors.at(*indices));
+                    // Set color with the mean of the three vertexes
+                    view->set_rasterizer_color(mesh->computed_colors.at(*indices));
 
                     bool inside = true;
 
@@ -188,6 +210,7 @@ namespace MGVisualizer
             mgMesh.transformed_vertices.resize(vertices_number);
             mgMesh.transformed_normals.resize(vertices_number);
             mgMesh.display_vertices.resize(vertices_number);
+            mgMesh.computed_colors.resize(vertices_number);
 
             // Get number of triangles and resize proper vectors
             size_t triangles_number = mesh->mNumFaces;
