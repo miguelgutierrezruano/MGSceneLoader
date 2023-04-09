@@ -29,8 +29,13 @@ namespace MGVisualizer
 		vector <  vec4 > original_vertices;
 		vector <   int > original_indices;
 		vector < Color > original_colors;
+		vector <  vec4 > original_normals;
+
 		vector <  vec4 > transformed_vertices;
 		vector < ivec4 > display_vertices;
+
+		vector < Color > computed_colors;
+		// Transformed normals
 
 	public:
 
