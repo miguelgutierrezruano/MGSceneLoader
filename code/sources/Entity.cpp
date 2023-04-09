@@ -96,7 +96,7 @@ namespace MGVisualizer
                 mgMesh.original_colors[index].set(diffuse_color.r, diffuse_color.g, diffuse_color.b);
 
                 auto& normal = mesh->mNormals[index];
-                mgMesh.original_normals[index] = vec4(normal.x, normal.y, normal.z, 0.f);
+                mgMesh.original_normals[index] = transformation * vec4(normal.x, normal.y, normal.z, 0.f);
             }
 
             auto indices_iterator = mgMesh.original_indices.begin();
