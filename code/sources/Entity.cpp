@@ -13,7 +13,7 @@ namespace MGVisualizer
 		transform = Transform(position, rotation, scale);
 		parent = parent_entity;
 
-		load_model(model_path);
+		load_model_nodes(model_path);
 	}
 
     void Entity::update(mat4 projection)
@@ -52,7 +52,7 @@ namespace MGVisualizer
             {
                 // Save transformed vertex in transformed vertices vector
                 vec4& vertex = mesh->transformed_vertices.at(index) =
-                    transformation * mesh->transform.get_matrix() * mesh->original_vertices.at(index);
+                    transformation * mesh->original_vertices.at(index);
 
                 // Give w value 1 back, normalize it by dividing
 
@@ -136,7 +136,7 @@ namespace MGVisualizer
         }
     }
 
-    void Entity::load_model(const char* model_path)
+    void Entity::load_model_nodes(const char* model_path)
     {
         Assimp::Importer importer;
 
@@ -146,77 +146,90 @@ namespace MGVisualizer
             aiProcess_Triangulate | aiProcess_JoinIdenticalVertices | aiProcess_SortByPType // Generate normals with assimp
         );
 
-        // If scene is null file could not be loaded
-
         if (scene && scene->mNumMeshes > 0)
         {
-            size_t sceneMeshes = scene->mNumMeshes;
+            // For now only root node, iterate each node recursively
+            aiNode* root = scene->mRootNode;
 
-            meshes.resize(sceneMeshes);
+            copy_nodes_recursive(root, scene, root->mTransformation);
+        }
+    }
 
-            // Loop all meshes
-            for (unsigned i = 0; i < scene->mNumMeshes; i++)
+    void Entity::copy_nodes_recursive(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform)
+    {
+        // If node has meshes copy them
+        if (node->mNumMeshes > 0)
+        {
+            copy_meshes(node, scene, parentTransform);
+        }
+
+        for (int i = 0; i < node->mNumChildren; i++)
+        {
+            copy_nodes_recursive(node->mChildren[i], scene, parentTransform * node->mTransformation);
+        }
+    }
+
+    void Entity::copy_meshes(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform)
+    {
+        // Make a MGMesh for each mesh in node
+        for (int i = 0; i < node->mNumMeshes; i++)
+        {
+            Mesh mgMesh;
+            // Get mesh
+            aiMesh* mesh = scene->mMeshes[node->mMeshes[i]];
+
+            // Get number of vertices and resize proper vectors
+            size_t vertices_number = mesh->mNumVertices;
+
+            mgMesh.original_vertices.resize(vertices_number);
+            mgMesh.original_colors.resize(vertices_number);
+            mgMesh.transformed_vertices.resize(vertices_number);
+            mgMesh.display_vertices.resize(vertices_number);
+
+            // Get number of triangles and resize proper vectors
+            size_t triangles_number = mesh->mNumFaces;
+
+            mgMesh.original_indices.resize(triangles_number * 3);
+
+            // Get color of mesh
+            aiColor4D diffuse_color;
+
+            // Get material of mesh
+            auto material = scene->mMaterials[mesh->mMaterialIndex];
+            aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse_color);
+
+            // Calculate transformation
+            mat4 transformation = aiToGlm(parentTransform) * aiToGlm(node->mTransformation);
+
+            // Iterate every vertex in mesh
+            for (size_t index = 0; index < mesh->mNumVertices; index++)
             {
-                Mesh mgMesh;
+                // Copy vertex coordinates
+                auto& vertex = mesh->mVertices[index];
+                mgMesh.original_vertices[index] = transformation * vec4(vertex.x, vertex.y, vertex.z, 1.f);
 
-                auto mesh = scene->mMeshes[i];
-                auto meshNode = scene->mRootNode->FindNode(mesh->mName);
-
-                if (meshNode)
-                {
-                    mgMesh.transform.set_transformation(aiToGlm(meshNode->mTransformation));
-                }
-
-                // Get number of vertices and resize proper vectors
-                size_t vertices_number = mesh->mNumVertices;
-
-                mgMesh.original_vertices.resize(vertices_number);
-                mgMesh.original_colors.resize(vertices_number);
-                mgMesh.transformed_vertices.resize(vertices_number);
-                mgMesh.display_vertices.resize(vertices_number);
-
-                // Get number of triangles and resize proper vectors
-                size_t triangles_number = mesh->mNumFaces;
-
-                mgMesh.original_indices.resize(triangles_number * 3);
-
-                // Get color of mesh
-                aiColor4D diffuse_color;
-
-                // Get material of mesh
-                auto material = scene->mMaterials[mesh->mMaterialIndex];
-                aiGetMaterialColor(material, AI_MATKEY_COLOR_DIFFUSE, &diffuse_color);
-
-                // Iterate every vertex in mesh
-                for (size_t index = 0; index < mesh->mNumVertices; index++)
-                {
-                    // Copy vertex coordinates
-                    auto& vertex = mesh->mVertices[index];
-                    mgMesh.original_vertices[index] = vec4(vertex.x, vertex.y, vertex.z, 1.f);
-
-                    // Copy color coordinates
-                    mgMesh.original_colors[index].set(diffuse_color.r, diffuse_color.g, diffuse_color.b);
-                }
-
-                auto indices_iterator = mgMesh.original_indices.begin();
-
-                // Generate indexes of triangles
-                for (size_t index = 0; index < mesh->mNumFaces; index++)
-                {
-                    auto& face = mesh->mFaces[index];
-
-                    // Make sure mesh is properly triangulated
-                    assert(face.mNumIndices == 3);              
-
-                    auto indices = face.mIndices;
-
-                    *indices_iterator++ = (int(indices[0]));
-                    *indices_iterator++ = (int(indices[1]));
-                    *indices_iterator++ = (int(indices[2]));
-                }
-
-                meshes.push_back(mgMesh);
+                // Copy color coordinates
+                mgMesh.original_colors[index].set(diffuse_color.r, diffuse_color.g, diffuse_color.b);
             }
+
+            auto indices_iterator = mgMesh.original_indices.begin();
+
+            // Generate indexes of triangles
+            for (size_t index = 0; index < mesh->mNumFaces; index++)
+            {
+                auto& face = mesh->mFaces[index];
+
+                // Make sure mesh is properly triangulated
+                assert(face.mNumIndices == 3);
+
+                auto indices = face.mIndices;
+
+                *indices_iterator++ = (int(indices[0]));
+                *indices_iterator++ = (int(indices[1]));
+                *indices_iterator++ = (int(indices[2]));
+            }
+
+            meshes.push_back(mgMesh);
         }
     }
 

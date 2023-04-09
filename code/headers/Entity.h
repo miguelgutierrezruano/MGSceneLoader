@@ -50,7 +50,11 @@ namespace MGVisualizer
 
 	private:
 
-		void load_model(const char* model_path);
+		void load_model_nodes(const char* model_path);
+
+		void copy_nodes_recursive(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform);
+		void copy_meshes(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform);
+
 		vector< ivec4 > clip_triangle(const ivec4* const vertices, const int* const indices_begin, int width, int height);
 
 		ivec4 get_intersection_horizontal(ivec4 point1, ivec4 point2, int yIntersect);

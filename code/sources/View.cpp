@@ -61,7 +61,7 @@ namespace MGVisualizer
 
 		angle++;
 
-		entities["rabbit"]->get_transform()->set_rotation(vec3(0, angle, 0.f));
+		//entities["rabbit"]->get_transform()->set_rotation(vec3(0, angle, 0.f));
 
         // Get projection matrix by moving the camera to (0, 0, 0) and the projection matrix
         mat4 inverseCamera = inverse(camera.transform.get_matrix());
