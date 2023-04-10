@@ -52,10 +52,10 @@ namespace MGVisualizer
 
         Light* ambientLight = new Light();
         ambientLight->set_intensity(0.1f);
-
         lights.push_back(ambientLight);
 
-        DirectionalLight* dirLight = new DirectionalLight(vec3(1.f, 1.f, 0.f));
+        DirectionalLight* dirLight = new DirectionalLight(vec3(-1.f, 1.f, 0.f));
+        dirLight->set_intensity(1.f);
         lights.push_back(dirLight);
 
         mouseLastPosition = vec2();

@@ -187,7 +187,7 @@ namespace MGVisualizer
                 // Compute lightning needs: Vertex world position, light vector, normal world position, vertex color
                 mesh->computed_colors.at(index) = compute_lightning(mesh->original_colors.at(index),
                     get_parent_matrix() * transform.get_matrix() * mesh->original_vertices.at(index), // World vertex
-                    mesh->transformed_normals.at(index),
+                    mesh->transformed_normals.at(index), // World normals
                     view->get_lights());
 
                 //mesh->computed_colors.at(index) = mesh->original_colors.at(index);
@@ -198,22 +198,23 @@ namespace MGVisualizer
             int* end = indices + mesh->original_indices.size();
 
             vector< int > clip_indices;
+            const float inverse255 = 1.f / 255.f;
 
             for (; indices < end; indices += 3)
             {
                 if (view->is_frontface(mesh->transformed_vertices.data(), indices))
                 {
                     // Set color with the mean of the three vertexes
-                    Color polygonColor(0, 0, 0);
+                    vec3 polygonColor = vec3(0, 0, 0);
 
                     bool inside = true;
 
                     for (auto index = indices; index < indices + 3; index++)
                     {
                         // When converted to float colors go random
-                        polygonColor = Color(polygonColor.red() + mesh->computed_colors.at(*index).red(),
-                            polygonColor.green() + mesh->computed_colors.at(*index).green(),
-                            polygonColor.blue() + mesh->computed_colors.at(*index).blue());
+                        polygonColor = vec3(polygonColor.r + mesh->computed_colors.at(*index).red(),
+                            polygonColor.g + mesh->computed_colors.at(*index).green(),
+                            polygonColor.b + mesh->computed_colors.at(*index).blue());
 
                         // Clip vertices
                         if (mesh->display_vertices.at(*index).x > (int)view->width ||
@@ -223,10 +224,10 @@ namespace MGVisualizer
                             inside = false;
                     }
 
-                    polygonColor = Color(polygonColor.red() / 3, polygonColor.green() / 3, polygonColor.blue() / 3);
-                    //polygonColor = mesh->computed_colors.at(*indices);
+                    polygonColor = vec3(polygonColor.r * inverse255 / 3, polygonColor.g * inverse255 / 3, polygonColor.b * inverse255 / 3);
 
-                    view->set_rasterizer_color(polygonColor);
+                    view->set_rasterizer_color(Color(polygonColor.r, polygonColor.g, polygonColor.b));
+                    //view->set_rasterizer_color(mesh->computed_colors.at(*indices));
 
                     if(inside)
                         view->rasterizer_fill_polygon(mesh->display_vertices.data(), indices, indices + 3);
@@ -297,9 +298,9 @@ namespace MGVisualizer
                         ambientColor.green() * ambientIntensity * inverse255,
                         ambientColor.blue() * ambientIntensity * inverse255);
 
-                    result += vec3(ambientLight.r * inverse255,
-                        ambientLight.g * inverse255,
-                        ambientLight.b * inverse255);
+                    result += vec3(ambientLight.r,
+                        ambientLight.g,
+                        ambientLight.b);
                 }
                 break;
 
@@ -315,14 +316,15 @@ namespace MGVisualizer
                         dirColor.green() * dirIntensity * inverse255,
                         dirColor.blue() * dirIntensity * inverse255);
 
-                    float diff = max(dot(vec3(normal.x, normal.y, normal.z), dirLight->get_direction()), 0.f);
+                    float diff = dot(vec3(normal.x, normal.y, normal.z), dirLight->get_direction());
 
-                    if (diff != 0)
-                        int a = 0;
+                    diff = diff < 0 ? 0 : diff;
 
                     vec3 diffuse = diff * directionalLightColor;
 
-                    result += diffuse;
+                    result += vec3(diffuse.r,
+                        diffuse.g,
+                        diffuse.b);
                 }
                 break;
 
@@ -331,7 +333,7 @@ namespace MGVisualizer
             }
         }
 
-        return Color(result.r * vertexColor.red(), result.g * vertexColor.green(), result.b * vertexColor.blue());
+        return Color(result.r * vertexColor.red() * inverse255, result.g * vertexColor.green() * inverse255, result.b * vertexColor.blue() * inverse255);
     }
 
     // Apply Sutherland-Hodgman algorithm

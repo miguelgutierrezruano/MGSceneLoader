@@ -23,7 +23,7 @@ namespace MGVisualizer
 		{
 			type = Directional;
 
-			direction = initialDirection;
+			direction = normalize(initialDirection);
 		}
 
 	public:
