@@ -24,16 +24,6 @@ namespace MGVisualizer
         color_buffer(width, height),
         rasterizer(color_buffer)
     { 
-        Entity* rabbit = new Entity("../binaries/stanford-bunny.obj");
-        entities.emplace("rabbit", rabbit);
-
-        entities["rabbit"]->get_transform()->set_position(vec3(0.f, 0.f, 50.f));
-        entities["rabbit"]->get_transform()->set_scale(vec3(2.f, 2.f, 2.f));
-
-        Entity* rabbit2 = new Entity("../binaries/stanford-bunny.obj", rabbit);
-        entities.emplace("rabbit2", rabbit2);
-        entities["rabbit2"]->get_transform()->set_position(vec3(-2.f, 0.f, 0.f));
-
         Entity* deer = new Entity("../binaries/deer.obj");
         entities.emplace("deer", deer);
 
@@ -47,6 +37,20 @@ namespace MGVisualizer
         entities["japan"]->get_transform()->set_position(vec3(0.f, -30.f, 100.f));
         entities["japan"]->get_transform()->set_rotation(vec3(0, 180, 0.f));
         entities["japan"]->get_transform()->set_scale(vec3(0.1f, 0.1f, 0.1f));
+
+        Entity* cloud = new Entity("../binaries/Cloud.obj");
+        entities.emplace("cloud", cloud);
+
+        entities["cloud"]->get_transform()->set_position(vec3(0.f, 60.f, 80.f));
+        entities["cloud"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
+        entities["cloud"]->get_transform()->set_scale(vec3(7.f, 7.f, 7.f));
+
+        Entity* eagle = new Entity("../binaries/eagle.obj", cloud);
+        entities.emplace("eagle", eagle);
+
+        entities["eagle"]->get_transform()->set_position(vec3(-4.f, 0.f, 0.f));
+        entities["eagle"]->get_transform()->set_rotation(vec3(180, 0, 0.f));
+        entities["eagle"]->get_transform()->set_scale(vec3(0.2f, 0.2f, 0.2f));
 
         camera.transform.set_position(vec3(0, 0, 0));
 
@@ -67,9 +71,9 @@ namespace MGVisualizer
 
 		static float angle = 0.f;
 
-		angle++;
+		angle += 3;
 
-		//entities["rabbit"]->get_transform()->set_rotation(vec3(0, angle, 0.f));
+		entities["cloud"]->get_transform()->set_rotation(vec3(180, angle, 0.f));
 
         // Get projection matrix by moving the camera to (0, 0, 0) and the projection matrix
         mat4 inverseCamera = inverse(camera.transform.get_matrix());

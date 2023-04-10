@@ -189,8 +189,6 @@ namespace MGVisualizer
                     get_parent_matrix() * transform.get_matrix() * mesh->original_vertices.at(index), // World vertex
                     mesh->transformed_normals.at(index), // World normals
                     view->get_lights());
-
-                //mesh->computed_colors.at(index) = mesh->original_colors.at(index);
             }
 
             // Create size pointers
