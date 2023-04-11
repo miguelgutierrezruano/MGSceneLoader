@@ -13,8 +13,13 @@ namespace MGVisualizer
 		nearPlane = 1.f;
 		farPlane = 100.f;
 
+#if _DEBUG
 		movementSpeed = 4.f;
 		rotationSpeed = 2.f;
+#else
+		movementSpeed = 20.f;
+		rotationSpeed = 20.f;
+#endif
 	}
 
 	void Camera::move_camera(float delta, vec2 positionDifference)

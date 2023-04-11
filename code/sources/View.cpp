@@ -52,7 +52,7 @@ namespace MGVisualizer
         entities["eagle"]->get_transform()->set_rotation(vec3(180, 0, 0.f));
         entities["eagle"]->get_transform()->set_scale(vec3(0.2f, 0.2f, 0.2f));
 
-        camera.transform.set_position(vec3(0, 0, 0));
+        camera.transform.set_position(vec3(0, 0, 200));
 
         Light* ambientLight = new Light();
         ambientLight->set_intensity(0.1f);
@@ -71,7 +71,7 @@ namespace MGVisualizer
 
 		static float angle = 0.f;
 
-		angle += 3;
+		angle += 1;
 
 		entities["cloud"]->get_transform()->set_rotation(vec3(180, angle, 0.f));
 

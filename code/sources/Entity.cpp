@@ -179,16 +179,12 @@ namespace MGVisualizer
             {
                 mesh->display_vertices.at(index) =
                     ivec4(transformation * mesh->transformed_vertices.at(index));
-            }
 
-            // Compute lightning and set color
-            for (size_t index = 0; index < number_of_vertices; index++)
-            {
-                // Compute lightning needs: Vertex world position, light vector, normal world position, vertex color
-                mesh->computed_colors.at(index) = compute_lightning(mesh->original_colors.at(index),
-                    get_parent_matrix() * transform.get_matrix() * mesh->original_vertices.at(index), // World vertex
-                    mesh->transformed_normals.at(index), // World normals
-                    view->get_lights());
+				// Compute lightning needs: Vertex world position, light vector, normal world position, vertex color
+				mesh->computed_colors.at(index) = compute_lightning(mesh->original_colors.at(index),
+					get_parent_matrix() * transform.get_matrix() * mesh->original_vertices.at(index), // World vertex
+					mesh->transformed_normals.at(index), // World normals
+					view->get_lights());
             }
 
             // Create size pointers
@@ -225,7 +221,6 @@ namespace MGVisualizer
                     polygonColor = vec3(polygonColor.r * inverse255 / 3, polygonColor.g * inverse255 / 3, polygonColor.b * inverse255 / 3);
 
                     view->set_rasterizer_color(Color(polygonColor.r, polygonColor.g, polygonColor.b));
-                    //view->set_rasterizer_color(mesh->computed_colors.at(*indices));
 
                     if(inside)
                         view->rasterizer_fill_polygon(mesh->display_vertices.data(), indices, indices + 3);
@@ -314,6 +309,7 @@ namespace MGVisualizer
                         dirColor.green() * dirIntensity * inverse255,
                         dirColor.blue() * dirIntensity * inverse255);
 
+					// Clamp this
                     float diff = dot(vec3(normal.x, normal.y, normal.z), dirLight->get_direction());
 
                     diff = diff < 0 ? 0 : diff;
