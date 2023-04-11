@@ -10,12 +10,15 @@
 namespace MGVisualizer
 {
 
-	// Perspective camera
+	/// <summary>
+	/// Perspective Camera Class
+	/// </summary>
 	class Camera
 	{
 
 	public:
 
+		/// Camera transform component
 		Transform transform;
 
 	private:
@@ -55,7 +58,18 @@ namespace MGVisualizer
 			transform.set_position(lastPosition + transform.get_right() * movementSpeed * delta);
 		}
 
+		/// <summary>
+		/// Move camera along X and Y axis
+		/// </summary>
+		/// <param name="delta">Time between frames</param>
+		/// <param name="positionDifference">Mouse position difference between frames</param>
 		void move_camera  (float delta, vec2 positionDifference);
+
+		/// <summary>
+		/// Rotate camera along X and Y axis
+		/// </summary>
+		/// <param name="delta">Time between frames</param>
+		/// <param name="positionDifference">Mouse position difference between frames</param>
 		void rotate_camera(float delta, vec2 positionDifference);
 
 		mat4 get_projection_matrix(float aspect_ratio);

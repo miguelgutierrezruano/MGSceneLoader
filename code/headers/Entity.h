@@ -22,6 +22,9 @@ namespace MGVisualizer
 	using argb::Rgb888;
 	using  std::vector;
 
+	/// <summary>
+	/// Class to render models in the scene
+	/// </summary>
 	class Entity
 	{
 

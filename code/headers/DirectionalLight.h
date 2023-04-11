@@ -9,12 +9,14 @@
 
 namespace MGVisualizer
 {
+	/// <summary>
+	/// Light coming from a specific direction
+	/// </summary>
 	class DirectionalLight : public Light
 	{
 
 	private:
 
-		// this or transform
 		glm::vec3 direction;
 
 	public:

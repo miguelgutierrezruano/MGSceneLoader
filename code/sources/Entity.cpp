@@ -143,7 +143,7 @@ namespace MGVisualizer
                 vec4& vertex = mesh->transformed_vertices.at(index) =
                     transformation * mesh->original_vertices.at(index);
 
-                // Since we only need world normals we dont multiply projection?
+                // Since we only need world normals we dont multiply projection
                 vec4& normal = mesh->transformed_normals.at(index) =
                     parentMatrix * transform.get_matrix() * mesh->original_normals.at(index);
 

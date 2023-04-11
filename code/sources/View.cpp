@@ -27,7 +27,7 @@ namespace MGVisualizer
         Entity* deer = new Entity("../binaries/deer.obj");
         entities.emplace("deer", deer);
 
-        entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 50.f));
+        entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 52.f));
         entities["deer"]->get_transform()->set_rotation(vec3(0, 90, 0.f));
         entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));
 
