@@ -52,7 +52,7 @@ namespace MGVisualizer
         entities["eagle"]->get_transform()->set_rotation(vec3(180, 0, 0.f));
         entities["eagle"]->get_transform()->set_scale(vec3(0.2f, 0.2f, 0.2f));
 
-        camera.transform.set_position(vec3(0, 0, 200));
+        camera.transform.set_position(vec3(0, 0, 0));
 
         Light* ambientLight = new Light();
         ambientLight->set_intensity(0.1f);
