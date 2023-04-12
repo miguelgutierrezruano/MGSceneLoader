@@ -140,12 +140,12 @@ namespace MGVisualizer
             for (size_t index = 0; index < number_of_vertices; index++)
             {
                 // Save transformed vertex in transformed vertices vector
-                vec4& vertex = mesh->transformed_vertices.at(index) =
-                    transformation * mesh->original_vertices.at(index);
+                vec4& vertex = mesh->transformed_vertices[index] =
+                    transformation * mesh->original_vertices[index];
 
                 // Since we only need world normals we dont multiply projection
-                vec4& normal = mesh->transformed_normals.at(index) =
-                    parentMatrix * transform.get_matrix() * mesh->original_normals.at(index);
+                vec4& normal = mesh->transformed_normals[index] =
+                    parentMatrix * transform.get_matrix() * mesh->original_normals[index];
 
                 // Normalize vertex
                 float divisor = 1.f / vertex.w;
@@ -177,13 +177,13 @@ namespace MGVisualizer
             // Transform every vertex of the mesh to view 
             for (size_t index = 0; index < number_of_vertices; index++)
             {
-                mesh->display_vertices.at(index) =
-                    ivec4(transformation * mesh->transformed_vertices.at(index));
+                mesh->display_vertices[index] =
+                    ivec4(transformation * mesh->transformed_vertices[index]);
 
 				// Compute lightning needs: Vertex world position, light vector, normal world position, vertex color
-				mesh->computed_colors.at(index) = compute_lightning(mesh->original_colors.at(index),
-					get_parent_matrix() * transform.get_matrix() * mesh->original_vertices.at(index), // World vertex
-					mesh->transformed_normals.at(index), // World normals
+				mesh->computed_colors[index] = compute_lightning(mesh->original_colors[index],
+					get_parent_matrix() * transform.get_matrix() * mesh->original_vertices[index], // World vertex
+					mesh->transformed_normals[index], // World normals
 					view->get_lights());
             }
 
@@ -206,15 +206,15 @@ namespace MGVisualizer
                     for (auto index = indices; index < indices + 3; index++)
                     {
                         // When converted to float colors go random
-                        polygonColor = vec3(polygonColor.r + mesh->computed_colors.at(*index).red(),
-                            polygonColor.g + mesh->computed_colors.at(*index).green(),
-                            polygonColor.b + mesh->computed_colors.at(*index).blue());
+                        polygonColor = vec3(polygonColor.r + mesh->computed_colors[*index].red(),
+                            polygonColor.g + mesh->computed_colors[*index].green(),
+                            polygonColor.b + mesh->computed_colors[*index].blue());
 
                         // Clip vertices
-                        if (mesh->display_vertices.at(*index).x > (int)view->width ||
-                            mesh->display_vertices.at(*index).x < 0 ||
-                            mesh->display_vertices.at(*index).y > (int)view->height ||
-                            mesh->display_vertices.at(*index).y < 0)
+                        if (mesh->display_vertices[*index].x > (int)view->width ||
+                            mesh->display_vertices[*index].x < 0 ||
+                            mesh->display_vertices[*index].y > (int)view->height ||
+                            mesh->display_vertices[*index].y < 0)
                             inside = false;
                     }
 
@@ -300,7 +300,7 @@ namespace MGVisualizer
                 case Light::Directional:
                 {
                     // Get light
-                    DirectionalLight* dirLight = dynamic_cast<DirectionalLight*>(lights.at(i));
+                    DirectionalLight* dirLight = dynamic_cast<DirectionalLight*>(lights[i]);
 
                     float dirIntensity = dirLight->get_intensity();
                     Color dirColor = dirLight->get_color();
