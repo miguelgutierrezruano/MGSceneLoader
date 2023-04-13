@@ -207,9 +207,9 @@ namespace MGVisualizer
                     for (auto index = indices; index < indices + 3; index++)
                     {
                         // When converted to float colors go random
-                        polygonColor = vec3(polygonColor.r + mesh->computed_colors[*index].red(),
-                            polygonColor.g + mesh->computed_colors[*index].green(),
-                            polygonColor.b + mesh->computed_colors[*index].blue());
+                        polygonColor += vec3(mesh->computed_colors[*index].red() * inverse255,
+                            mesh->computed_colors[*index].green() * inverse255,
+                            mesh->computed_colors[*index].blue() * inverse255);
 
                         // Clip vertices
                         if (mesh->display_vertices[*index].x > (int)view->width ||
@@ -219,7 +219,7 @@ namespace MGVisualizer
                             inside = false;
                     }
 
-                    polygonColor = vec3(polygonColor.r * inverse255 / 3, polygonColor.g * inverse255 / 3, polygonColor.b * inverse255 / 3);
+                    polygonColor = vec3(polygonColor.r / 3, polygonColor.g / 3, polygonColor.b / 3);
 
                     view->set_rasterizer_color(Color(polygonColor.r, polygonColor.g, polygonColor.b));
 
