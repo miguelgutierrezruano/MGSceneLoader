@@ -5,6 +5,7 @@
 
 #include "Entity.h"
 #include "View.h"
+#include "Clipper.h"
 
 namespace MGVisualizer
 {
@@ -226,22 +227,14 @@ namespace MGVisualizer
                         view->rasterizer_fill_polygon(mesh->display_vertices.data(), indices, indices + 3);
                     //else
                     //{
-                    //    auto clipped_vertices = clip_triangle(mesh->display_vertices.data(), indices, view->width, view->height);
+                    //    ivec4 clipped_vertices[10];
+                    //    const static int clipped_indices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-                    //    if (clipped_vertices.size() > 0)
-                    //    {
-                    //        clip_indices.clear();
-                    //        clip_indices.reserve(clipped_vertices.size());
+                    //    int n = Clipper::clip(mesh->display_vertices.data(), indices, indices + 3, clipped_vertices);
 
-                    //        for (int i = 0; i < (int)clipped_vertices.size(); i++)
-                    //            clip_indices.push_back(i);
-
-                    //        const int* clip_start = clip_indices.data();
-                    //        const int* clip_end = clip_start + clip_indices.size();
-
-                    //        // Commented until doubts are resolved
-                    //        view->rasterizer_fill_polygon(clipped_vertices.data(), clip_start, clip_end);
-                    //    }
+                    //    // If clipped vertices make a polygon then fill it
+                    //    if(n > 2)
+                    //        view->rasterizer_fill_polygon(clipped_vertices, clipped_indices, clipped_indices + n);                         
                     //}
                 }
             }
@@ -328,207 +321,6 @@ namespace MGVisualizer
         }
 
         return Color(result.r * vertexColor.red() * inverse255, result.g * vertexColor.green() * inverse255, result.b * vertexColor.blue() * inverse255);
-    }
-
-    // Apply Sutherland-Hodgman algorithm
-    vector< ivec4 > Entity::clip_triangle(const ivec4* const vertices, const int* const indices_begin, int width, int height)
-    {
-        // Create array with the given triangle
-        vector< ivec4 > output = { vertices[*indices_begin], vertices[*indices_begin + 1], vertices[*indices_begin + 2] };
-
-        // Clip left side
-        output = clip_left(output, 0);
-        // Clip bottom side
-        if (output.size() > 0)
-            output = clip_top(output, 0);
-        // Clip right side
-        if (output.size() > 0)
-            output = clip_right(output, width);
-        // Clip top side
-        if (output.size() > 0)
-            output = clip_bottom(output, height);
-
-        return output;
-    }
-
-    ivec4 Entity::get_intersection_horizontal(ivec4 point1, ivec4 point2, int yIntersect)
-    {
-        int xDiff = abs(point2.x - point1.x);
-        int yDiff = abs(point2.y - point1.y);
-
-        // If line is horizontal then return point
-        if (yDiff == 0) return point1;
-
-        int t = (yIntersect - point1.y) / yDiff;
-        int x = point1.x + t * xDiff;
-
-        return ivec4(x, yIntersect, 1, 1);
-    }
-
-    ivec4 Entity::get_intersection_vertical(ivec4 point1, ivec4 point2, int xIntersect)
-    {
-        int xDiff = abs(point2.x - point1.x);
-        int yDiff = abs(point2.y - point1.y);
-
-        // If line is vertical then return point
-        if (xDiff == 0) return point1;
-
-        int t = (xIntersect - point1.x) / xDiff;
-        int y = point1.y + t * yDiff;
-
-        return ivec4(xIntersect, y, 1, 1);
-    }
-
-    vector<ivec4> Entity::clip_left(const vector<ivec4>& polygon, int xMin)
-    {
-        vector< ivec4 > result;
-
-        size_t numVertices = polygon.size();
-        ivec4 currentVertex = polygon[numVertices - 1];
-
-        for (size_t i = 0; i < numVertices; i++)
-        {
-            ivec4 comparedVertex = polygon[i];
-
-            // Compared vertex is inside of the clippinng window
-            if (comparedVertex.x >= xMin)
-            {
-                // Current vertex is outside push intersection
-                if (currentVertex.x < xMin)
-                {
-                    ivec4 intersect = get_intersection_vertical(currentVertex, comparedVertex, xMin);
-                    result.push_back(intersect);
-                }
-
-                // Always push compared
-                result.push_back(comparedVertex);
-            }
-            // If compared is outside and current is inside push intersection
-            else if (currentVertex.x >= xMin)
-            {
-                ivec4 intersect = get_intersection_vertical(currentVertex, comparedVertex, xMin);
-                result.push_back(intersect);
-            }
-            // If both are out they get discarded
-
-            currentVertex = comparedVertex;
-        }
-
-        return result;
-    }
-
-    vector<ivec4> Entity::clip_right(const vector<ivec4>& polygon, int xMax)
-    {
-        vector< ivec4 > result;
-
-        size_t numVertices = polygon.size();
-        ivec4 currentVertex = polygon[numVertices - 1];
-
-        for (size_t i = 0; i < numVertices; i++)
-        {
-            ivec4 comparedVertex = polygon[i];
-
-            // Compared vertex is inside of the clippinng window
-            if (comparedVertex.x <= xMax)
-            {
-                // Current vertex is outside push intersection
-                if (currentVertex.x > xMax)
-                {
-                    ivec4 intersect = get_intersection_vertical(currentVertex, comparedVertex, xMax);
-                    result.push_back(intersect);
-                }
-
-                // Always push compared
-                result.push_back(comparedVertex);
-            }
-            // If compared is outside and current is inside push intersection
-            else if (currentVertex.x <= xMax)
-            {
-                ivec4 intersect = get_intersection_vertical(currentVertex, comparedVertex, xMax);
-                result.push_back(intersect);
-            }
-            // If both are out they get discarded
-
-            currentVertex = comparedVertex;
-        }
-
-        return result;
-    }
-
-    vector<ivec4> Entity::clip_top(const vector<ivec4>& polygon, int yMin)
-    {
-        vector< ivec4 > result;
-
-        size_t numVertices = polygon.size();
-        ivec4 currentVertex = polygon[numVertices - 1];
-
-        for (size_t i = 0; i < numVertices; i++)
-        {
-            ivec4 comparedVertex = polygon[i];
-
-            // Compared vertex is inside of the clippinng window
-            if (comparedVertex.y >= yMin)
-            {
-                // Current vertex is outside push intersection
-                if (currentVertex.y < yMin)
-                {
-                    ivec4 intersect = get_intersection_horizontal(currentVertex, comparedVertex, yMin);
-                    result.push_back(intersect);
-                }
-
-                // Always push compared
-                result.push_back(comparedVertex);
-            }
-            // If compared is outside and current is inside push intersection
-            else if (currentVertex.y >= yMin)
-            {
-                ivec4 intersect = get_intersection_horizontal(currentVertex, comparedVertex, yMin);
-                result.push_back(intersect);
-            }
-            // If both are out they get discarded
-
-            currentVertex = comparedVertex;
-        }
-
-        return result;
-    }
-
-    vector<ivec4> Entity::clip_bottom(const vector<ivec4>& polygon, int yMax)
-    {
-        vector< ivec4 > result;
-
-        size_t numVertices = polygon.size();
-        ivec4 currentVertex = polygon[numVertices - 1];
-
-        for (size_t i = 0; i < numVertices; i++)
-        {
-            ivec4 comparedVertex = polygon[i];
-
-            // Compared vertex is inside of the clippinng window
-            if (comparedVertex.y <= yMax)
-            {
-                // Current vertex is outside push intersection
-                if (currentVertex.y > yMax)
-                {
-                    ivec4 intersect = get_intersection_horizontal(currentVertex, comparedVertex, yMax);
-                    result.push_back(intersect);
-                }
-
-                // Always push compared
-                result.push_back(comparedVertex);
-            }
-            // If compared is outside and current is inside push intersection
-            else if (currentVertex.y <= yMax)
-            {
-                ivec4 intersect = get_intersection_horizontal(currentVertex, comparedVertex, yMax);
-                result.push_back(intersect);
-            }
-            // If both are out they get discarded
-
-            currentVertex = comparedVertex;
-        }
-
-        return result;
     }
 
     mat4 Entity::aiToGlm(const aiMatrix4x4& from)

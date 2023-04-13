@@ -52,7 +52,7 @@ namespace MGVisualizer
 			intensity = 1;
 		}
 
-		virtual void method() { }
+		virtual void illuminate() { }
 	};
 }
 

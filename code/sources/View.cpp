@@ -49,8 +49,15 @@ namespace MGVisualizer
         entities.emplace("eagle", eagle);
 
         entities["eagle"]->get_transform()->set_position(vec3(-4.f, 0.f, 0.f));
-        entities["eagle"]->get_transform()->set_rotation(vec3(180, 0, 0.f));
+        entities["eagle"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
         entities["eagle"]->get_transform()->set_scale(vec3(0.2f, 0.2f, 0.2f));
+
+        /*Entity* triangle = new Entity("../binaries/triangle.obj");
+        entities.emplace("triangle", triangle);
+
+        entities["triangle"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
+        entities["triangle"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
+        entities["triangle"]->get_transform()->set_scale(vec3(10.f, 10.f, 10.f));*/
 
         camera.transform.set_position(vec3(0, 0, 0));
 
@@ -73,7 +80,7 @@ namespace MGVisualizer
 
 		angle += 1;
 
-		entities["cloud"]->get_transform()->set_rotation(vec3(180, angle, 0.f));
+		entities["cloud"]->get_transform()->set_rotation(vec3(0, angle, 0.f));
 
         // Get projection matrix by moving the camera to (0, 0, 0) and the projection matrix
         mat4 inverseCamera = inverse(camera.transform.get_matrix());

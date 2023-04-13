@@ -30,6 +30,9 @@
     <ClCompile Include="..\code\sources\Transform.cpp">
       <Filter>sources</Filter>
     </ClCompile>
+    <ClCompile Include="..\code\sources\Clipper.cpp">
+      <Filter>sources</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="..\code\headers\Rasterizer.h">
@@ -57,6 +60,9 @@
       <Filter>headers</Filter>
     </ClInclude>
     <ClInclude Include="..\code\headers\math.hpp">
+      <Filter>headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\code\headers\Clipper.h">
       <Filter>headers</Filter>
     </ClInclude>
   </ItemGroup>

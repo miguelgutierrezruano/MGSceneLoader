@@ -61,16 +61,6 @@ namespace MGVisualizer
 		void copy_nodes_recursive(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform);
 		void copy_meshes(aiNode* node, const aiScene* scene, aiMatrix4x4 parentTransform);
 
-		vector< ivec4 > clip_triangle(const ivec4* const vertices, const int* const indices_begin, int width, int height);
-
-		ivec4 get_intersection_horizontal(ivec4 point1, ivec4 point2, int yIntersect);
-		ivec4 get_intersection_vertical  (ivec4 point1, ivec4 point2, int xIntersect);
-
-		vector< ivec4 > clip_left  (const vector<ivec4>& polygon, int xMin);
-		vector< ivec4 > clip_right (const vector<ivec4>& polygon, int xMax);
-		vector< ivec4 > clip_bottom(const vector<ivec4>& polygon, int yMin);
-		vector< ivec4 > clip_top   (const vector<ivec4>& polygon, int yMax);
-
 		mat4 aiToGlm(const aiMatrix4x4& from);
 	};
 }
