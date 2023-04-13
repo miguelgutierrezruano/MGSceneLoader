@@ -9,9 +9,9 @@
 
 namespace MGVisualizer
 {
-	Entity::Entity(const char* model_path, Entity* parent_entity, vec3 position, vec3 rotation, vec3 scale)
+	Entity::Entity(const char* model_path, Entity* parent_entity)
 	{
-		transform = Transform(position, rotation, scale);
+		transform = Transform();
 		parent = parent_entity;
 
 		load_model_nodes(model_path);
@@ -197,7 +197,8 @@ namespace MGVisualizer
 
             for (; indices < end; indices += 3)
             {
-                if (view->is_frontface(mesh->transformed_vertices.data(), indices))
+                // For some reason frontfaces are not really well calculated
+                if (not view->is_backface(mesh->transformed_vertices.data(), indices))
                 {
                     // Set color with the mean of the three vertexes
                     vec3 polygonColor = vec3(0, 0, 0);
@@ -249,15 +250,21 @@ namespace MGVisualizer
         // Get parent matrix
         if (parent != nullptr)
         {
-            Entity* parentIt = parent;
-            parentMatrix *= parentIt->get_transform()->get_matrix();
+            vector< mat4 > parentList;
 
+            Entity* parentIt = parent;
+
+            // Get vector of parents
             while (parentIt != nullptr)
             {
+                parentList.push_back(parentIt->get_transform()->get_matrix());
                 parentIt = parentIt->get_parent();
+            }
 
-                if (parentIt != nullptr)
-                    parentMatrix *= parentIt->get_transform()->get_matrix();
+            // Iterate vector backwards multiplying the matrix
+            for (int i = (int)parentList.size() - 1; i >= 0; i--)
+            {
+                parentMatrix *= parentList[i];
             }
         }
 

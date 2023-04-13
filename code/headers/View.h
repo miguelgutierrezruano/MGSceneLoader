@@ -44,6 +44,9 @@ namespace MGVisualizer
 
         glm::vec2 mouseLastPosition;
 
+        float worldRotation;
+        float cloudRotation;
+
     public:
 
         unsigned width;
@@ -66,6 +69,6 @@ namespace MGVisualizer
 
         vector< Light* >& get_lights() { return lights; }
         
-        bool  is_frontface(const vec4* const projected_vertices, const int* const indices);
+        bool  is_backface(const vec4* const projected_vertices, const int* const indices);
     };
 }

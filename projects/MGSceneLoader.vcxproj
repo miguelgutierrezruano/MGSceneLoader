@@ -99,7 +99,6 @@
     <ClInclude Include="..\code\headers\DirectionalLight.h" />
     <ClInclude Include="..\code\headers\Entity.h" />
     <ClInclude Include="..\code\headers\Light.h" />
-    <ClInclude Include="..\code\headers\math.hpp" />
     <ClInclude Include="..\code\headers\Mesh.h" />
     <ClInclude Include="..\code\headers\Rasterizer.h" />
     <ClInclude Include="..\code\headers\Transform.h" />

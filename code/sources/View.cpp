@@ -24,33 +24,33 @@ namespace MGVisualizer
         color_buffer(width, height),
         rasterizer(color_buffer)
     { 
-        Entity* deer = new Entity("../binaries/deer.obj");
-        entities.emplace("deer", deer);
-
-        entities["deer"]->get_transform()->set_position(vec3(-20.f, -20.f, 52.f));
-        entities["deer"]->get_transform()->set_rotation(vec3(0, 90, 0.f));
-        entities["deer"]->get_transform()->set_scale(vec3(0.02f, 0.02f, 0.02f));
-
         Entity* japan = new Entity("../binaries/japan.fbx");
         entities.emplace("japan", japan);
 
-        entities["japan"]->get_transform()->set_position(vec3(0.f, -30.f, 100.f));
-        entities["japan"]->get_transform()->set_rotation(vec3(0, 180, 0.f));
+        entities["japan"]->get_transform()->set_position(vec3(20.f, 30.f, -140.f));
+        entities["japan"]->get_transform()->set_rotation(vec3(180, 270, 0.f));
         entities["japan"]->get_transform()->set_scale(vec3(0.1f, 0.1f, 0.1f));
 
-        Entity* cloud = new Entity("../binaries/Cloud.obj");
+        Entity* deer = new Entity("../binaries/deer.obj", japan);
+        entities.emplace("deer", deer);
+
+        entities["deer"]->get_transform()->set_position(vec3(400.f, 90.f, 360.f));
+        entities["deer"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
+        entities["deer"]->get_transform()->set_scale(vec3(0.2f, 0.2f, 0.2f));
+
+        Entity* cloud = new Entity("../binaries/Cloud.obj", japan);
         entities.emplace("cloud", cloud);
 
-        entities["cloud"]->get_transform()->set_position(vec3(0.f, 60.f, 80.f));
+        entities["cloud"]->get_transform()->set_position(vec3(0.f, 1000.f, 0.f));
         entities["cloud"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
-        entities["cloud"]->get_transform()->set_scale(vec3(7.f, 7.f, 7.f));
+        entities["cloud"]->get_transform()->set_scale(vec3(70.f, 70.f, 70.f));
 
         Entity* eagle = new Entity("../binaries/eagle.obj", cloud);
         entities.emplace("eagle", eagle);
 
-        entities["eagle"]->get_transform()->set_position(vec3(-4.f, 0.f, 0.f));
+        entities["eagle"]->get_transform()->set_position(vec3(5.f, 0.f, 0.f));
         entities["eagle"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
-        entities["eagle"]->get_transform()->set_scale(vec3(0.2f, 0.2f, 0.2f));
+        entities["eagle"]->get_transform()->set_scale(vec3(0.1f, 0.1f, 0.1f));
 
         /*Entity* triangle = new Entity("../binaries/triangle.obj");
         entities.emplace("triangle", triangle);
@@ -59,28 +59,31 @@ namespace MGVisualizer
         entities["triangle"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
         entities["triangle"]->get_transform()->set_scale(vec3(10.f, 10.f, 10.f));*/
 
-        camera.transform.set_position(vec3(0, 0, -150.f));
+        camera.transform.set_position(vec3(120, -25, 0));
+        camera.transform.set_rotation(vec3(10, 35, 0));
 
         Light* ambientLight = new Light();
         ambientLight->set_intensity(0.1f);
         lights.push_back(ambientLight);
 
-        DirectionalLight* dirLight = new DirectionalLight(vec3(-1.f, 1.f, 0.f));
+        DirectionalLight* dirLight = new DirectionalLight(vec3(1.f, -1.f, 0.f));
         dirLight->set_intensity(1.f);
         lights.push_back(dirLight);
 
         mouseLastPosition = vec2();
+
+        worldRotation = 0;
+        cloudRotation = 0;
     }
 
     void View::update()
     {
         // Create projection matrix
+        cloudRotation -= 0.5f;
+        worldRotation += 0.1f;
 
-		static float angle = 0.f;
-
-		angle += 1;
-
-		entities["cloud"]->get_transform()->set_rotation(vec3(0, angle, 0.f));
+        entities["japan"]->get_transform()->set_rotation(vec3(vec3(180, 270 + worldRotation, 0.f)));
+		entities["cloud"]->get_transform()->set_rotation(vec3(0, cloudRotation, 0.f));
 
         // Get projection matrix by moving the camera to (0, 0, 0) and the projection matrix
         mat4 inverseCamera = inverse(camera.transform.get_matrix());
@@ -99,7 +102,7 @@ namespace MGVisualizer
         // rango de int (que es lo que espera fill_convex_polygon_z_buffer).
 
         mat4 identity(1);
-        mat4 scaling = scale(identity, glm::vec3(float(width / 2), float(height / 2), 1.f));
+        mat4 scaling = scale(identity, glm::vec3(float(width / 2), float(height / 2), 1000000.f));
         mat4 translation = translate(identity, glm::vec3(float(width / 2), float(height / 2), 0.f));
         mat4 transformation = translation * scaling;
 
@@ -135,11 +138,11 @@ namespace MGVisualizer
             if (Keyboard::isKeyPressed(Keyboard::W))
                 camera.move_camera_front(delta);
             if (Keyboard::isKeyPressed(Keyboard::A))
-                camera.move_camera_right(delta);
+                camera.move_camera_left(delta);
             if (Keyboard::isKeyPressed(Keyboard::S))
                 camera.move_camera_back(delta);
             if (Keyboard::isKeyPressed(Keyboard::D))
-                camera.move_camera_left(delta);
+                camera.move_camera_right(delta);
 
             camera.rotate_camera(delta, positionDifference);
         }   
@@ -164,7 +167,7 @@ namespace MGVisualizer
             rasterizer.fill_convex_polygon_z_buffer(vertices, indices_begin, indices_end);
     }
 
-    bool View::is_frontface(const vec4* const projected_vertices, const int* const indices)
+    bool View::is_backface(const vec4* const projected_vertices, const int* const indices)
     {
         const vec4& v0 = projected_vertices[indices[0]];
         const vec4& v1 = projected_vertices[indices[1]];

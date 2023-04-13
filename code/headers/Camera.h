@@ -37,13 +37,13 @@ namespace MGVisualizer
 		void move_camera_front(float delta)
 		{  
 			vec3 lastPosition = transform.get_position();
-			transform.set_position(lastPosition - transform.get_forward() * movementSpeed * delta);
+			transform.set_position(lastPosition + transform.get_forward() * movementSpeed * delta);
 		}
 
 		void  move_camera_back(float delta)
 		{
 			vec3 lastPosition = transform.get_position();
-			transform.set_position(lastPosition + transform.get_forward() * movementSpeed * delta);
+			transform.set_position(lastPosition - transform.get_forward() * movementSpeed * delta);
 		}
 
 		void  move_camera_left(float delta)

@@ -59,9 +59,6 @@
     <ClInclude Include="..\code\headers\DirectionalLight.h">
       <Filter>headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\code\headers\math.hpp">
-      <Filter>headers</Filter>
-    </ClInclude>
     <ClInclude Include="..\code\headers\Clipper.h">
       <Filter>headers</Filter>
     </ClInclude>

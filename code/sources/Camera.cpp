@@ -17,7 +17,7 @@ namespace MGVisualizer
 		movementSpeed = 4.f;
 		rotationSpeed = 2.f;
 #else
-		movementSpeed = 25.f;
+		movementSpeed = 70.f;
 		rotationSpeed = 20.f;
 #endif
 	}
@@ -26,11 +26,11 @@ namespace MGVisualizer
 	{
 		// Modify position over right vector
 		vec3 lastPosition = transform.get_position();
-		transform.set_position(lastPosition + transform.get_right() * positionDifference.x * delta);
+		transform.set_position(lastPosition - transform.get_right() * movementSpeed * positionDifference.x * delta);
 
 		// Modify position over up vector
 		lastPosition = transform.get_position();
-		transform.set_position(lastPosition + transform.get_up() * positionDifference.y * delta);
+		transform.set_position(lastPosition - transform.get_up() * movementSpeed * positionDifference.y * delta);
 	}
 
 	void Camera::rotate_camera(float delta, vec2 positionDifference)

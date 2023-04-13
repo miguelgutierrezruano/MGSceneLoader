@@ -10,7 +10,10 @@
 #include <ciso646>
 #include <cstdint>
 #include <limits>
-#include "math.hpp"
+
+#include <glm/glm.hpp>
+
+using namespace glm;
 
 namespace MGVisualizer
 {
@@ -76,14 +79,14 @@ namespace MGVisualizer
 
         void fill_convex_polygon
         (
-            const Point4i* const vertices,
+            const ivec4* const vertices,
             const int* const indices_begin,
             const int* const indices_end
         );
 
         void fill_convex_polygon_z_buffer
         (
-            const Point4i* const vertices,
+            const ivec4* const vertices,
             const int* const indices_begin,
             const int* const indices_end
         );
@@ -104,7 +107,7 @@ namespace MGVisualizer
     template< class  COLOR_BUFFER_TYPE >
     void Rasterizer< COLOR_BUFFER_TYPE >::fill_convex_polygon
     (
-        const Point4i* const vertices,
+        const ivec4* const vertices,
         const int* const indices_begin,
         const int* const indices_end
     )
@@ -222,7 +225,7 @@ namespace MGVisualizer
     template< class  COLOR_BUFFER_TYPE >
     void Rasterizer< COLOR_BUFFER_TYPE >::fill_convex_polygon_z_buffer
     (
-        const Point4i* const vertices,
+        const ivec4* const vertices,
         const int* const indices_begin,
         const int* const indices_end
     )
