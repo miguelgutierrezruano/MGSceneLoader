@@ -225,17 +225,17 @@ namespace MGVisualizer
 
                     if(inside)
                         view->rasterizer_fill_polygon(mesh->display_vertices.data(), indices, indices + 3);
-                    //else
-                    //{
-                    //    ivec4 clipped_vertices[10];
-                    //    const static int clipped_indices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
+                    else
+                    {
+                        ivec4 clipped_vertices[10];
+                        const static int clipped_indices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-                    //    int n = Clipper::clip(mesh->display_vertices.data(), indices, indices + 3, clipped_vertices);
+                        int n = Clipper::clip(mesh->display_vertices.data(), indices, indices + 3, clipped_vertices);
 
-                    //    // If clipped vertices make a polygon then fill it
-                    //    if(n > 2)
-                    //        view->rasterizer_fill_polygon(clipped_vertices, clipped_indices, clipped_indices + n);                         
-                    //}
+                        // If clipped vertices make a polygon then fill it
+                        if(n > 2)
+                            view->rasterizer_fill_polygon(clipped_vertices, clipped_indices, clipped_indices + n);                         
+                    }
                 }
             }
         }

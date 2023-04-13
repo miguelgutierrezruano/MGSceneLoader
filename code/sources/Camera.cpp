@@ -9,7 +9,7 @@ namespace MGVisualizer
 {
 	Camera::Camera()
 	{
-		fov = 40.f;
+		fov = 20.f;
 		nearPlane = 1.f;
 		farPlane = 100.f;
 
@@ -17,7 +17,7 @@ namespace MGVisualizer
 		movementSpeed = 4.f;
 		rotationSpeed = 2.f;
 #else
-		movementSpeed = 20.f;
+		movementSpeed = 25.f;
 		rotationSpeed = 20.f;
 #endif
 	}

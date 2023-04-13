@@ -59,7 +59,7 @@ namespace MGVisualizer
         entities["triangle"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
         entities["triangle"]->get_transform()->set_scale(vec3(10.f, 10.f, 10.f));*/
 
-        camera.transform.set_position(vec3(0, 0, 0));
+        camera.transform.set_position(vec3(0, 0, -150.f));
 
         Light* ambientLight = new Light();
         ambientLight->set_intensity(0.1f);
