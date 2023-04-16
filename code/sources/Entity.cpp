@@ -19,8 +19,10 @@ namespace MGVisualizer
 
     void Entity::load_model_nodes(const char* model_path)
     {
+        // Create assimp importer
         Assimp::Importer importer;
 
+        // Read 3D file scene
         auto scene = importer.ReadFile
         (
             model_path,
@@ -29,9 +31,9 @@ namespace MGVisualizer
 
         if (scene && scene->mNumMeshes > 0)
         {
-            // For now only root node, iterate each node recursively
             aiNode* root = scene->mRootNode;
 
+            // Iterate each aiNode to render model properly
             copy_nodes_recursive(root, scene, root->mTransformation);
         }
     }
@@ -44,6 +46,7 @@ namespace MGVisualizer
             copy_meshes(node, scene, parentTransform);
         }
 
+        // Copy nodes foreach child in node
         for (unsigned i = 0; i < node->mNumChildren; i++)
         {
             copy_nodes_recursive(node->mChildren[i], scene, parentTransform * node->mTransformation);
@@ -207,19 +210,20 @@ namespace MGVisualizer
 
                     for (auto index = indices; index < indices + 3; index++)
                     {
-                        // When converted to float colors go random
+                        // Sum each vertex color
                         polygonColor += vec3(mesh->computed_colors[*index].red() * inverse255,
                             mesh->computed_colors[*index].green() * inverse255,
                             mesh->computed_colors[*index].blue() * inverse255);
 
                         // Clip vertices
-                        if (mesh->display_vertices[*index].x > (int)view->width ||
+                        if (mesh->display_vertices[*index].x > (int)view->get_width() ||
                             mesh->display_vertices[*index].x < 0 ||
-                            mesh->display_vertices[*index].y > (int)view->height ||
+                            mesh->display_vertices[*index].y > (int)view->get_height() ||
                             mesh->display_vertices[*index].y < 0)
                             inside = false;
                     }
 
+                    // Normalize polygon color
                     polygonColor = vec3(polygonColor.r / 3, polygonColor.g / 3, polygonColor.b / 3);
 
                     view->set_rasterizer_color(Color(polygonColor.r, polygonColor.g, polygonColor.b));
@@ -231,7 +235,7 @@ namespace MGVisualizer
                         ivec4 clipped_vertices[10];
                         const static int clipped_indices[] = { 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 };
 
-                        int n = Clipper::clip(mesh->display_vertices.data(), indices, indices + 3, clipped_vertices);
+                        int n = Clipper::clip(mesh->display_vertices.data(), indices, indices + 3, clipped_vertices, view->get_width(), view->get_height());
 
                         // If clipped vertices make a polygon then fill it
                         if(n > 2)

@@ -16,7 +16,15 @@ namespace MGVisualizer
 
 	public:
 
-		static int clip(const ivec4* vertices, int* first_index, int* last_index, ivec4* clipped_vertices);
+		/// <summary>
+		/// Clip vertices in an 800x600 window
+		/// </summary>
+		/// <param name="vertices">Pointer to first vertex of the polygon</param>
+		/// <param name="first_index">Pointer to the index of the first vertex</param>
+		/// <param name="last_index">Pointer to the index of the last vertex</param>
+		/// <param name="clipped_vertices">Pointer to first element of array where clipped vertices are going to be storaged</param>
+		/// <returns>Number of vertices of the clipped polygon</returns>
+		static int clip(const ivec4* vertices, int* first_index, int* last_index, ivec4* clipped_vertices, int width, int height);
 
 	private:
 

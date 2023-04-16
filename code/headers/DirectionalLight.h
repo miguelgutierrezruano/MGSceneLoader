@@ -21,6 +21,10 @@ namespace MGVisualizer
 
 	public:
 
+		/// <summary>
+		/// Constructor of directional light
+		/// </summary>
+		/// <param name="initialDirection">Direction the light comes from</param>
 		DirectionalLight(glm::vec3 initialDirection)
 		{
 			type = Directional;

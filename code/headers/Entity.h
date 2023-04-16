@@ -42,12 +42,27 @@ namespace MGVisualizer
 
 	public:
 
+		/// <summary>
+		/// Constructor of entity
+		/// </summary>
+		/// <param name="model_path">Path to 3D file</param>
+		/// <param name="parent_entity">Parent of this entity</param>
 		Entity(const char* model_path, Entity* parent_entity = nullptr);
 
 		Transform* get_transform() { return &transform; }
 		Entity* get_parent() { return parent; }
 
+		/// <summary>
+		/// Update position and normals of entity
+		/// </summary>
+		/// <param name="projection">Projection matrix of the main camera</param>
 		void update(mat4 projection);
+
+		/// <summary>
+		/// Render entity in given view
+		/// </summary>
+		/// <param name="transformation">Transformation matrix to viewport coordinates</param>
+		/// <param name="view">View where to render this entity</param>
 		void render(mat4 transformation, View * view);
 
 	private:

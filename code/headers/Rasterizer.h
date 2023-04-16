@@ -1,5 +1,5 @@
 
-// Este código es de dominio público.
+// Public domain code given by
 // angel.rodriguez@esne.edu
 // 2013.12 - 2021.03
 

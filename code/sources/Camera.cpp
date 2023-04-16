@@ -9,6 +9,7 @@ namespace MGVisualizer
 {
 	Camera::Camera()
 	{
+		// Default camera settings
 		fov = 20.f;
 		nearPlane = 1.f;
 		farPlane = 100.f;

@@ -18,10 +18,15 @@ namespace MGVisualizer
 
 	public:
 
+		/// <summary>
+		/// Types of lights
+		/// </summary>
 		enum Types
 		{
 			Ambient, 
 			Directional,
+
+			// TODO: Do point light
 			Point
 		};
 
@@ -52,6 +57,9 @@ namespace MGVisualizer
 			intensity = 1;
 		}
 
+	private:
+
+		// Virtual method needed to make casts
 		virtual void illuminate() { }
 	};
 }

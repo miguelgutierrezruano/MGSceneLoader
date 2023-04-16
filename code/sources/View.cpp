@@ -24,6 +24,7 @@ namespace MGVisualizer
         color_buffer(width, height),
         rasterizer(color_buffer)
     { 
+        // Create entities
         Entity* japan = new Entity("../binaries/japan.fbx");
         entities.emplace("japan", japan);
 
@@ -52,16 +53,11 @@ namespace MGVisualizer
         entities["eagle"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
         entities["eagle"]->get_transform()->set_scale(vec3(0.1f, 0.1f, 0.1f));
 
-        /*Entity* triangle = new Entity("../binaries/triangle.obj");
-        entities.emplace("triangle", triangle);
-
-        entities["triangle"]->get_transform()->set_position(vec3(0.f, 0.f, 10.f));
-        entities["triangle"]->get_transform()->set_rotation(vec3(0, 0, 0.f));
-        entities["triangle"]->get_transform()->set_scale(vec3(10.f, 10.f, 10.f));*/
-
-        camera.transform.set_position(vec3(120, -25, 0));
+        // Set camera transformation
+        camera.transform.set_position(vec3(120, -40, 0));
         camera.transform.set_rotation(vec3(10, 35, 0));
 
+        // Create lights
         Light* ambientLight = new Light();
         ambientLight->set_intensity(0.1f);
         lights.push_back(ambientLight);
@@ -78,7 +74,6 @@ namespace MGVisualizer
 
     void View::update()
     {
-        // Create projection matrix
         cloudRotation -= 0.5f;
         worldRotation += 0.1f;
 
@@ -96,11 +91,7 @@ namespace MGVisualizer
 
     void View::render()
     {
-        // Se convierten las coordenadas transformadas y proyectadas a coordenadas
-        // de recorte (-1 a +1) en coordenadas de pantalla con el origen centrado.
-        // La coordenada Z se escala a un valor suficientemente grande dentro del
-        // rango de int (que es lo que espera fill_convex_polygon_z_buffer).
-
+        // Transform to display coordinates
         mat4 identity(1);
         mat4 scaling = scale(identity, glm::vec3(float(width / 2), float(height / 2), 1000000.f));
         mat4 translation = translate(identity, glm::vec3(float(width / 2), float(height / 2), 0.f));
@@ -112,7 +103,7 @@ namespace MGVisualizer
         for (auto& [name, entity] : entities)
             entity->render(transformation, this);
 
-        // Se copia el framebúffer oculto en el framebúffer de la ventana:
+        // Swap buffers
 
         color_buffer.blit_to_window();
     }
@@ -172,9 +163,6 @@ namespace MGVisualizer
         const vec4& v0 = projected_vertices[indices[0]];
         const vec4& v1 = projected_vertices[indices[1]];
         const vec4& v2 = projected_vertices[indices[2]];
-
-        // Se asumen coordenadas proyectadas y polígonos definidos en sentido horario.
-        // Se comprueba a qué lado de la línea que pasa por v0 y v1 queda el punto v2:
 
         return ((v1[0] - v0[0]) * (v2[1] - v0[1]) - (v2[0] - v0[0]) * (v1[1] - v0[1]) < 0.f);
     }

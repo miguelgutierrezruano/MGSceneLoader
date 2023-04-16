@@ -42,16 +42,28 @@ namespace MGVisualizer
 
 		void set_transformation(mat4 newTransformation);
 
+		/// <summary>
+		/// Get forward vector for this transform
+		/// </summary>
+		/// <returns>Normalized forward vector</returns>
 		const vec3 get_forward();
+
+		/// <summary>
+		/// Get right vector for this transform
+		/// </summary>
+		/// <returns>Normalized right vector</returns>
 		const vec3 get_right();
+
+		/// <summary>
+		/// Get up vector for this transform
+		/// </summary>
+		/// <returns>Normalized up vector</returns>
 		const vec3 get_up();
 
-		// Make matrix out of scale, rotate and translate
 		const mat4 get_matrix() { return transformationMatrix; }
 
 	private:
 
-		// Since in this project most meshes will be static is better to keep the matrix
 		void update_matrix();
 	};
 }
